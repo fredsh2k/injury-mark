@@ -1,4 +1,8 @@
-# React + TypeScript + Vite
+# injury-mark
+
+A project for marking injuries on a human body.  
+
+# Vite + React + TypeScript
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
