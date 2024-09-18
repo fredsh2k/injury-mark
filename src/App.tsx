@@ -552,7 +552,11 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
     setSubmissions([])
   }
 
-
+  const handleRowDelete = (index: number) => {
+    const updatedSubmissions = submissions.filter((_, i) => i !== index);
+    setSubmissions(updatedSubmissions);
+    localStorage.setItem('formSubmissions', JSON.stringify(updatedSubmissions));
+  };
 
   return (
     <div className='flex flex-col'>
@@ -581,7 +585,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
       {/* create a table from submissions, split each injury to a new line */}
       <table>
         <thead className='bg-gray-100'>
-          <tr>
+          <tr className='border border-gray-300'>
             <th>מספר אירוע מנפ"צ</th>
             <th>מספר טראומה מנפ"צ</th>
             <th>מספר נפגע במאנ"ח</th>
@@ -591,11 +595,12 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
             <th>תאריך ושעת בדיקת PM-CT</th>
             <th>פענות PM-CT</th>
             <th>פציעות</th>
+            <th>הסרה</th>
           </tr>
         </thead>
         <tbody>
           {submissions.map((submission: Submission, index: number) => (
-            <tr key={index}>
+            <tr key={index} className='border border-gray-300'>
               <td>{submission.manpatzIncidentNumber}</td>
               <td>{submission.manpatzTraumaNumber}</td>
               <td>{submission.maanahCasualtyNumber}</td>
@@ -610,6 +615,15 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
                     <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}</li>
                   ))}
                 </ul>
+              </td>
+              <td>
+                {/* row delete button */}
+                <button
+                  className='w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  onClick={() => handleRowDelete(index)}
+                  >
+                    הסר
+                </button>
               </td>
             </tr>
           ))}
