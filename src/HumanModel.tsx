@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three'
 import { ThreeEvent } from '@react-three/fiber';
