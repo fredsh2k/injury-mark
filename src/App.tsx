@@ -370,7 +370,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             </label>
             <select
               className="w-full py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              name="type"
+              name="selectedLocation"
               value={injuryFormData.selectedLocation}
               onChange={handleChangeInjury}
               id='selectedLocation'
