@@ -1,12 +1,17 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three'
+import { ThreeEvent } from '@react-three/fiber';
 
 
-const HumanModel = ({ onClick, modelRef }) => {
+interface HumanModelProps {
+  onClick: (event: ThreeEvent<MouseEvent>) => void;
+  modelRef: React.Ref<THREE.Object3D>;
+}
 
-  const { scene } = useGLTF("src/assets/models/human_body.glb"); // Load 3D model (GLTF or GLB format)
+const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef }) => {
+
+  const { scene } = useGLTF("human_body.glb"); // Load 3D model (GLTF or GLB format)
 
   return (
     <>

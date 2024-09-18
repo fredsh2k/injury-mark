@@ -1,11 +1,10 @@
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, ThreeEvent} from '@react-three/fiber'
 import './App.css'
-import CasualtyForm from './CasualtyForm'
 import HumanModel from './HumanModel'
 import { useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-const MarkInjuries = ({ submissions, setSubmissions }) => {
+const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>> }) => {
 
   const initialFormData = {
     manpatzIncidentNumber: '',
@@ -23,10 +22,10 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
 
   const initialInjury = { type: '', description: '', selectedLocation: '', location: { x: 0, y: 0, z: 0 }, radius: 0 }
 
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState<Submission>(initialFormData);
   const [injuryFormData, setInjuryFormData] = useState(initialInjury);
 
-  const handleChangeInjury = (e) => {
+  const handleChangeInjury = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
 
     // if name contains location, take the last part of the string and set it as the key
@@ -36,7 +35,7 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
         ...injuryFormData,
         location: {
           ...injuryFormData.location,
-          [locationField]: value
+          [locationField as string]: value
         }
       });
       return
@@ -50,7 +49,7 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
   }
 
   // Handle form input changes
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setFormData({
@@ -59,7 +58,7 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
     });
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
     const savedData = JSON.parse(localStorage.getItem('formSubmissions') || '[]')
     const updatedData = [...savedData, formData]
@@ -91,62 +90,69 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
   };
 
   const modelRef = useRef<THREE.Group>(null);
-  const [dimensions, setDimensions] = useState({ min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } })
-  const [isLoaded, setIsLoaded] = useState(false)
+  const [, setDimensions] = useState({ min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } })
+  const [isLoaded] = useState(false)
 
 
 
   useEffect(() => {
     if (isLoaded && modelRef.current) {
-      const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
-      // boundingBox.getSize(new THREE.Vector3()); 
 
-      setDimensions({
-        min: {
-          x: boundingBox.min.x,
-          y: boundingBox.min.y,
-          z: boundingBox.min.z
-        },
-        max: {
-          x: boundingBox.max.x,
-          y: boundingBox.max.y,
-          z: boundingBox.max.z
-        }
-      })
+      if (modelRef.current) {
+        const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
+        setDimensions({
+          min: {
+            x: boundingBox.min.x,
+            y: boundingBox.min.y,
+            z: boundingBox.min.z
+          },
+          max: {
+            x: boundingBox.max.x,
+            y: boundingBox.max.y,
+            z: boundingBox.max.z
+          }
+        })
+      }
     }
+    // boundingBox.getSize(new THREE.Vector3()); 
+
   }, [modelRef.current]);
 
 
-  const handleClick = (e) => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
     // Get the mouse coordinates in 3D space
     e.stopPropagation(); // Prevent event from propagating to parent elements
 
-    const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
-    const { min, max } = boundingBox
+    if (modelRef.current) {
+      const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
+      const { min, max } = boundingBox
 
-    const { x, y, z } = e.point;
-    // console.log({ x, y, z });
+      const { x, y, z } = e.point;
+      // console.log({ x, y, z });
 
-    // normalize x, y, z to be between -1, 1
-    const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1
-    const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1
-    const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1
-    // console.log({normalizedX, normalizedY, normalizedZ})
+      // normalize x, y, z to be between -1, 1
+      const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1
+      const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1
+      const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1
+      // console.log({normalizedX, normalizedY, normalizedZ})
 
-    const fixedX = parseFloat(normalizedX.toFixed(4))
-    const fixedY = parseFloat(normalizedY.toFixed(4))
-    const fixedZ = parseFloat(normalizedZ.toFixed(4))
+      const fixedX = parseFloat(normalizedX.toFixed(4))
+      const fixedY = parseFloat(normalizedY.toFixed(4))
+      const fixedZ = parseFloat(normalizedZ.toFixed(4))
 
-    console.log({ fixedX, fixedY, fixedZ })
+      console.log({ fixedX, fixedY, fixedZ })
 
-    setInjuryFormData({
-      ...injuryFormData,
-      location: {
-        x: fixedX,
-        y: fixedY,
-        z: fixedZ
-      }
-    });
+      setInjuryFormData({
+        ...injuryFormData,
+        location: {
+          x: fixedX,
+          y: fixedY,
+          z: fixedZ
+        }
+      });
+
+    }
+
 
   };
 
@@ -444,7 +450,7 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
 
           <h1 className='text-xl border-b pb-2 my-4'>רשימת פציעות</h1>
           <ol className='list-decimal'>
-            {formData.injuries.map((injury, index) => (
+            {formData.injuries.map((injury: Injury, index: number) => (
               <li key={index}>{`${injury.type} - ${injury.description} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}
                 <button
                   className='w-16 h-8 mx-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
@@ -473,7 +479,39 @@ const MarkInjuries = ({ submissions, setSubmissions }) => {
   )
 }
 
-const InjuriesTable = ({ submissions, setSubmissions }) => {
+// create interface injury
+interface Injury {
+  type: string
+  description: string
+  selectedLocation: string
+  location: {
+    x: number
+    y: number
+    z: number
+  }
+  radius: number
+}
+// create type submission
+interface Submission {
+  manpatzIncidentNumber: string
+  manpatzTraumaNumber: string
+  maanahCasualtyNumber: string
+  id: string
+  personalNumber: string
+  incidentDateTime: string
+  demiseDateTime: string
+  externalTestDateTime: string
+  PMCTDateTime: string
+  PMCTInterpretation: string
+  injuries: Injury[]
+}
+
+interface InjuriesTableProps {
+  submissions: Submission[];
+  setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>>;
+}
+
+const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
 
   // Download JSON file
   const handleDownload = () => {
@@ -513,6 +551,8 @@ const InjuriesTable = ({ submissions, setSubmissions }) => {
     localStorage.removeItem('formSubmissions')
     setSubmissions([])
   }
+
+
 
   return (
     <div className='flex flex-col'>
@@ -554,7 +594,7 @@ const InjuriesTable = ({ submissions, setSubmissions }) => {
           </tr>
         </thead>
         <tbody>
-          {submissions.map((submission, index) => (
+          {submissions.map((submission: Submission, index: number) => (
             <tr key={index}>
               <td>{submission.manpatzIncidentNumber}</td>
               <td>{submission.manpatzTraumaNumber}</td>
@@ -567,7 +607,7 @@ const InjuriesTable = ({ submissions, setSubmissions }) => {
               <td>
                 <ul className='list-decimal'>
                   {submission.injuries.map((injury, index) => (
-                    <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}</li>
+                    <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}</li>
                   ))}
                 </ul>
               </td>
@@ -603,7 +643,7 @@ function App() {
             onClick={() => handleTabChange('injuriesTable')}>טבלת חללים</button>
         </div>
 
-        {activeTab === 'markInjuries' && <MarkInjuries submissions={submissions} setSubmissions={setSubmissions}></MarkInjuries>}
+        {activeTab === 'markInjuries' && <MarkInjuries setSubmissions={setSubmissions}></MarkInjuries>}
         {activeTab === 'injuriesTable' && <InjuriesTable submissions={submissions} setSubmissions={setSubmissions}></InjuriesTable>}
 
       </div>
