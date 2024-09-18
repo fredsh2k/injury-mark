@@ -1,10 +1,104 @@
-import { Canvas, ThreeEvent} from '@react-three/fiber'
+import { Canvas, ThreeEvent } from '@react-three/fiber'
 import './App.css'
 import HumanModel from './HumanModel'
 import { useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
 const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>> }) => {
+
+  const selectedLocations = [
+    'אחר',
+    'אגן',
+    'אוזניים',
+    'איבר מין',
+    'אמה',
+    'אף',
+    'אשך',
+    'בטן',
+    'בטן עליון',
+    'בטן תחתון',
+    'בית השחי',
+    'ברך',
+    'גב',
+    'גב עליון',
+    'גב תחתון',
+    'גפיים עליונות',
+    'גפיים תחתונות',
+    'התחשמלות',
+    'זרוע',
+    'חזה',
+    'טביעה',
+    'ירך',
+    'כללי',
+    'כף יד',
+    'כף רגל',
+    'כתף',
+    'לא ידוע',
+    'לסת',
+    'מפשעה',
+    'מרפק',
+    'נפש',
+    'עיניים',
+    'עכוז',
+    'פה',
+    'פנים',
+    'צוואר',
+    'צוואר אחורי',
+    'צוואר קדמי',
+    'קרקפת',
+    'ראש',
+    'שאיפה',
+    'שוק',
+    'תרמי'
+  ];
+
+  // פגיעה חודרת - ירי, פגיעה חודרת - רסיס, פגיעה חודרת - דקירה, פגיעה חודרת - אחר
+  // גוף זר
+  // חבלה קהה
+  // כוויה / שריפה - תרמית, כוויה / שריפה - כימית, כוויה / שריפה - חשמלית, כוויה / שריפה - אחר
+  // פיח
+  // קטיעה - קטיעה חלקית, קטיעה - קטיעה מלאה
+  // שפשוף
+  // המטומה תת עורית
+  // דפורמציה גרמית - שבר סגור, דפורמציה גרמית - שבר פתוח
+  // חסר רקמה משמעותי
+  // CAT
+  // חבישה - פקינג, חבישה - FC, חבישה - אחר
+  // פרוצדורה רפואית פולשנית - עירוי IV, פרוצדורה רפואית פולשנית - עירוי IO, פרוצדורה רפואית פולשנית - אינטובציה, פרוצדורה רפואית פולשנית - קוניוטומיה, פרוצדורה רפואית פולשנית - נקז חזה, פרוצדורה רפואית פולשנית - נידל
+  // פגיעות גדולות / אחרות / כלליות
+
+  // create a list of injury types from the text above
+  const injuryTypes = [
+    'פגיעות גדולות / אחרות / כלליות',
+    'פגיעה חודרת - ירי',
+    'פגיעה חודרת - רסיס',
+    'פגיעה חודרת - דקירה',
+    'פגיעה חודרת - אחר',
+    'גוף זר',
+    'חבלה קהה',
+    'כוויה / שריפה - תרמית',
+    'כוויה / שריפה - כימית',
+    'כוויה / שריפה - חשמלית',
+    'כוויה / שריפה - אחר',
+    'פיח',
+    'קטיעה - קטיעה חלקית',
+    'קטיעה - קטיעה מלאה',
+    'שפשוף',
+    'המטומה תת עורית',
+    'דפורמציה גרמית - שבר סגור',
+    'דפורמציה גרמית - שבר פתוח',
+    'חסר רקמה משמעותי',
+    'CAT',
+    'חבישה - פקינג',
+    'חבישה - FC',
+    'חבישה - אחר',
+    'פרוצדורה רפואית פולשנית - עירוי IV',
+    'פרוצדורה רפואית פולשנית - עירוי IO',
+    'פרוצדורה רפואית פולשנית - אינטובציה',
+    'פרוצדורה רפואית פולשנית - קוניוטומיה',
+    'פרוצדורה רפואית פולשנית - נקז חזה',
+    'פרוצדורה רפואית פולשנית - נידל',
+  ];
 
   const initialFormData = {
     manpatzIncidentNumber: '',
@@ -343,10 +437,10 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChangeInjury}
               id='type'
             >
-              <option value="">בחר</option>
-              <option value="פגיעה חודרת">פגיעה חודרת</option>
-              <option value="חבלה קהה">חבלה קהה</option>
-              <option value="כוויה \ שריפה">כוויה \ שריפה</option>
+              {/* create option from each injury type */}
+              {injuryTypes.map((type, index) => (
+                <option key={index} value={type}>{type}</option>
+              ))}
             </select>
           </div>
 
@@ -375,15 +469,10 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChangeInjury}
               id='selectedLocation'
             >
-              <option value="אחר">אחר</option>
-              {/*איבן מין,  אגן אוזניים אחר איבר_מין אמה אף אשך בטן*/}
-              <option value="אגן" >אגן</option>
-              <option value="אוזניים">אוזניים</option>
-              <option value="איבר מין">איבר מין</option>
-              <option value="אמה">אמה</option>
-              <option value="אף">אף</option>
-              <option value="אשך">אשך</option>
-              <option value="בטן">בטן</option>
+              {/* create option from each selectedLocation */}
+              {selectedLocations.map((location, index) => (
+                <option key={index} value={location}>{location}</option>
+              ))}
             </select>
           </div>
 
@@ -621,8 +710,8 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
                 <button
                   className='w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
                   onClick={() => handleRowDelete(index)}
-                  >
-                    הסר
+                >
+                  הסר
                 </button>
               </td>
             </tr>
