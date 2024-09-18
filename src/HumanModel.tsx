@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three'
 import { ThreeEvent } from '@react-three/fiber';
@@ -7,16 +7,23 @@ import { ThreeEvent } from '@react-three/fiber';
 interface HumanModelProps {
   onClick: (event: ThreeEvent<MouseEvent>) => void;
   modelRef: React.Ref<THREE.Object3D>;
+  markers: Marker[];
 }
 
-const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef }) => {
+interface Marker {
+  position: THREE.Vector3;
+}
+
+const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) => {
 
   const { scene } = useGLTF("human_body.glb"); // Load 3D model (GLTF or GLB format)
 
   return (
     <>
       <ambientLight intensity={2} />
-      <pointLight position={[10, 10, 10]} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={1.5} />
+      <pointLight position={[-10, -10, -10]} decay={0} intensity={1.5} />
+
       <OrbitControls
         enableZoom={true}
         minPolarAngle={0}
@@ -28,7 +35,12 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef }) => {
           onPointerDown={onClick}
 
           receiveShadow />
-        {/* <primitive object={scene} scale={[50, 50, 50]} onPointerDown={onClick} receiveShadow /> */}
+        {markers && markers.map((marker, index) => (
+          <mesh key={index} position={marker.position}>
+            <sphereGeometry args={[0.005, 10, 10]} />
+            <meshStandardMaterial color="red" />
+          </mesh>
+        ))}
       </Suspense>
     </>
   )

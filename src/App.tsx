@@ -4,7 +4,13 @@ import HumanModel from './HumanModel'
 import { useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+interface Marker {
+  position: THREE.Vector3;
+}
+
 const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>> }) => {
+
+
 
   const selectedLocations = [
     'אחר',
@@ -118,6 +124,10 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
   const [formData, setFormData] = useState<Submission>(initialFormData);
   const [injuryFormData, setInjuryFormData] = useState(initialInjury);
+  const [markers, setMarkers] = useState<Marker[]>([]);
+  const [marker, setMarker] = useState<Marker | null>(null);
+  const [marked, setMarked] = useState(false);
+
 
   const handleChangeInjury = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -172,6 +182,13 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     // reset injury form
     setInjuryFormData(initialInjury);
 
+    // add marker to markers
+    if (marker) {
+      setMarkers([...markers, marker]);
+    }
+
+    // reset marker
+    setMarker(null);
   };
 
   // Remove an injury input field
@@ -235,6 +252,22 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       const fixedZ = parseFloat(normalizedZ.toFixed(4))
 
       console.log({ fixedX, fixedY, fixedZ })
+
+      const intersect = e.intersections[0];
+      if (intersect) {
+        const point = intersect.point;
+        setMarker({ position: point });
+
+        if (marked) {
+          const prevMarkers = markers.slice(0, markers.length - 1);
+          setMarkers([...prevMarkers, { position: point }]);
+        } else {
+          setMarkers([...markers, { position: point }]);
+        }
+
+        setMarked(true);
+
+      }
 
       setInjuryFormData({
         ...injuryFormData,
@@ -542,7 +575,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             {formData.injuries.map((injury: Injury, index: number) => (
               <li key={index}>{`${injury.type} - ${injury.description} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}
                 <button
-                  className='w-16 h-8 mx-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  className='w-16 h-8 m-1 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
                   onClick={() => removeInjuryField(index)}>
                   הסר
                 </button>
@@ -554,7 +587,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
         <div className="flex flex-col w-1/3 rounded-lg shadow-md p-6 m-6">
           <Canvas camera={{ position: [0, 0.4, 1], fov: 90 }}>
-            <HumanModel onClick={handleClick} modelRef={modelRef}></HumanModel>
+            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
           </Canvas>
           <button
             className="w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6"
@@ -689,7 +722,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
         </thead>
         <tbody>
           {submissions.map((submission: Submission, index: number) => (
-            <tr key={index} className='border border-gray-300'>
+            <tr key={index} className='border border-gray-300 hover:bg-gray-100'>
               <td>{submission.manpatzIncidentNumber}</td>
               <td>{submission.manpatzTraumaNumber}</td>
               <td>{submission.maanahCasualtyNumber}</td>
@@ -726,6 +759,7 @@ function App() {
 
   const [submissions, setSubmissions] = useState(() => JSON.parse(localStorage.getItem('formSubmissions') || '[]'))
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('activeTab') || 'markInjuries')
+
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab)
