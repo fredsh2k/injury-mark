@@ -20,9 +20,11 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) =
 
   return (
     <>
-      <ambientLight intensity={2} />
-      <spotLight position={[0, 50, 50]} angle={5} penumbra={1} decay={0} intensity={2} />
-      <pointLight position={[0, 50, 50]} decay={0} intensity={1} />
+      <ambientLight intensity={1} />
+      <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
+      <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
+      <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
+      <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
 
       <OrbitControls
         enableZoom={true}
@@ -30,11 +32,12 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) =
         maxPolarAngle={Math.PI}
         enablePan={true}
       />
+
       <Suspense fallback={null}>
         <primitive ref={modelRef} object={scene} position={[0, 0, 0]} scale={[5, 5, 5]} zoom={10}
           onPointerDown={onClick}
-
           receiveShadow />
+
         {markers && markers.map((marker, index) => (
           <mesh key={index} position={marker.position}>
             <sphereGeometry args={[0.5, 10, 10]} />

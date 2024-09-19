@@ -475,7 +475,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
         </div>
 
         <div className="flex flex-col w-1/3 rounded-lg shadow-md p-6 m-6">
-          <Canvas camera={{ position: [0, 15, 50], fov: 90 }}>
+          <Canvas camera={{ position: [0, 25, 50], fov: 90 }}>
             <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
           </Canvas>
           <button
