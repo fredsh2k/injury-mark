@@ -482,7 +482,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             className="w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6"
             onClick={(e) => handleSubmit(e)}
           >
-            שמור
+            שמור חלל
           </button>
         </div>
       </div>
