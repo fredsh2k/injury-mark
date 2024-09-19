@@ -72,7 +72,6 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     localStorage.setItem('formSubmissions', JSON.stringify(updatedData))
     setSubmissions(updatedData);
     setFormData(initialFormData) // Reset form
-    console.log('form submitted')
   }
 
   // Add a new injury object
@@ -99,8 +98,6 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
     // handle markers
     const updatedMarkers = markers.filter((_, i) => i !== index);
-    console.log({markers})
-    console.log({updatedMarkers})
     setMarkers(updatedMarkers);
   };
 
@@ -135,19 +132,16 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       const { min, max } = boundingBox
 
       const { x, y, z } = e.point;
-      // console.log({ x, y, z });
 
       // normalize x, y, z to be between -1, 1
       const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1
       const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1
       const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1
-      // console.log({normalizedX, normalizedY, normalizedZ})
 
       const fixedX = parseFloat(normalizedX.toFixed(4))
       const fixedY = parseFloat(normalizedY.toFixed(4))
       const fixedZ = parseFloat(normalizedZ.toFixed(4))
 
-      console.log({ fixedX, fixedY, fixedZ })
 
       const intersect = e.intersections[0];
       if (intersect) {
@@ -481,7 +475,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
         </div>
 
         <div className="flex flex-col w-1/3 rounded-lg shadow-md p-6 m-6">
-          <Canvas camera={{ position: [0, 0.4, 1], fov: 90 }}>
+          <Canvas camera={{ position: [0, 15, 50], fov: 90 }}>
             <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
           </Canvas>
           <button
