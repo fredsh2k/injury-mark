@@ -16,7 +16,7 @@ interface Marker {
 
 const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) => {
 
-  const { scene } = useGLTF("human_body.glb"); // Load 3D model (GLTF or GLB format)
+  const { scene } = useGLTF("human_body.glb");
 
   return (
     <>
