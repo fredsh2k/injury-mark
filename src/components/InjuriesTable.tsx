@@ -95,7 +95,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
         <tbody>
           {submissions.map((submission: Submission, index: number) => (
             <tr key={index} className='border border-gray-300 hover:bg-gray-100'>
-              <td>{submission.manpatzIncidentNumber}</td>
+              <td className="px-4">{submission.manpatzIncidentNumber}</td>
               <td>{submission.manpatzTraumaNumber}</td>
               <td>{submission.maanahCasualtyNumber}</td>
               <td>{submission.incidentDateTime}</td>
@@ -113,7 +113,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
               <td>
                 {/* row delete button */}
                 <button
-                  className='w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  className='mx-2 w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
                   onClick={() => handleRowDelete(index)}
                 >
                   הסר

@@ -21,7 +21,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     injuries: []
   }
 
-  const initialInjury = { type: '', description: '', selectedLocation: '', location: { x: 0, y: 0, z: 0 }, radius: 0 }
+  const initialInjury = { type: injuryTypes[0], description: '', selectedLocation: selectedLocations[0], location: { x: 0, y: 0, z: 0 }, radius: 0 }
 
   const [formData, setFormData] = useState<Submission>(initialFormData);
   const [injuryFormData, setInjuryFormData] = useState(initialInjury);
@@ -32,7 +32,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
   const modelRef = useRef<THREE.Group>(null);
 
-  const handleChangeInjury = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChangeInjury = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
 
     // if name contains location, take the last part of the string and set it as the key
@@ -56,7 +56,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   }
 
   // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     setFormData({
@@ -168,186 +168,193 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       });
 
     }
+  };
 
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
   };
 
   return (
-    <div>
+    <div className="flex h-screen">
 
-      <div className='flex flex-row'>
+      {/* Hideable sidebar */}
+      {isSidebarVisible && (
+        <div className="w-1/3 p-4 rounded-lg shadow-md m-6">
 
-        <div className='flex flex-col w-1/3'>
+          <h1 className='text-xl pb-2 mb-4 border-b'>זיהוי החלל</h1>
 
-          <div className='rounded-lg shadow-md p-6 m-6'>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              מספר אירוע מנפ"צ
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="manpatzIncidentNumber"
+              type="text"
+              placeholder=""
+              name="manpatzIncidentNumber"
+              value={formData.manpatzIncidentNumber}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div className="">
-              <h1 className='text-xl pb-2 mb-4 border-b'>זיהוי החלל</h1>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              מספר טראומה מנפ"צ
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="manpatzTraumaNumber"
+              type="text"
+              placeholder=""
+              name="manpatzTraumaNumber"
+              value={formData.manpatzTraumaNumber}
+              onChange={handleChange}
+            />
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  מספר אירוע מנפ"צ
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="manpatzIncidentNumber"
-                  type="text"
-                  placeholder=""
-                  name="manpatzIncidentNumber"
-                  value={formData.manpatzIncidentNumber}
-                  onChange={handleChange}
-                />
-              </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              מספר נפגע במאנ"ח
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="maanahCasualtyNumber"
+              type="text"
+              placeholder=""
+              name="maanahCasualtyNumber"
+              value={formData.maanahCasualtyNumber}
+              onChange={handleChange}
+            />
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  מספר טראומה מנפ"צ
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="manpatzTraumaNumber"
-                  type="text"
-                  placeholder=""
-                  name="manpatzTraumaNumber"
-                  value={formData.manpatzTraumaNumber}
-                  onChange={handleChange}
-                />
-              </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              תעודת זהות
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="id"
+              type="text"
+              placeholder=""
+              name="id"
+              value={formData.id}
+              onChange={handleChange}
+            />
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  מספר נפגע במאנ"ח
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="maanahCasualtyNumber"
-                  type="text"
-                  placeholder=""
-                  name="maanahCasualtyNumber"
-                  value={formData.maanahCasualtyNumber}
-                  onChange={handleChange}
-                />
-              </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              מספר אישי
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="personalNumber"
+              type="text"
+              placeholder=""
+              name="personalNumber"
+              value={formData.personalNumber}
+              onChange={handleChange}
+            />
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  תעודת זהות
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="id"
-                  type="text"
-                  placeholder=""
-                  name="id"
-                  value={formData.id}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  מספר אישי
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="personalNumber"
-                  type="text"
-                  placeholder=""
-                  name="personalNumber"
-                  value={formData.personalNumber}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  תאריך ושעת האירוע
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="incidentDateTime"
-                  type="datetime-local"
-                  placeholder=""
-                  name="incidentDateTime"
-                  value={formData.incidentDateTime}
-                  onChange={handleChange}
-                />
-
-              </div>
-
-              <h1 className='text-xl p-2 mb-4 border-b'>נתוני פטירה</h1>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  תאריך ושעת פטירה
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="demiseDateTime"
-                  type="datetime-local"
-                  placeholder=""
-                  name="demiseDateTime"
-                  value={formData.demiseDateTime}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  תאריך ושעת בדיקה חיצונית
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="externalTestDateTime"
-                  type="datetime-local"
-                  placeholder=""
-                  name="externalTestDateTime"
-                  value={formData.externalTestDateTime}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  תאריך ושעת בדיקת PM-CT
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="PMCTDateTime"
-                  type="datetime-local"
-                  placeholder=""
-                  name="PMCTDateTime"
-                  value={formData.PMCTDateTime}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  פענות PM-CT
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="PMCTInterpretation"
-                  type="text"
-                  placeholder=""
-                  name="PMCTInterpretation"
-                  value={formData.PMCTInterpretation}
-                  onChange={handleChange}
-                />
-              </div>
-
-            </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              תאריך ושעת האירוע
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="incidentDateTime"
+              type="datetime-local"
+              placeholder=""
+              name="incidentDateTime"
+              value={formData.incidentDateTime}
+              onChange={handleChange}
+            />
 
           </div>
 
-          {/* <CasualtyForm></CasualtyForm> */}
-        </div>
+          <h1 className='text-xl p-2 mb-4 border-b'>נתוני פטירה</h1>
 
-        <div className='flex flex-col w-1/3 rounded-lg shadow-md p-6 m-6'>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              תאריך ושעת פטירה
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="demiseDateTime"
+              type="datetime-local"
+              placeholder=""
+              name="demiseDateTime"
+              value={formData.demiseDateTime}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              תאריך ושעת בדיקה חיצונית
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="externalTestDateTime"
+              type="datetime-local"
+              placeholder=""
+              name="externalTestDateTime"
+              value={formData.externalTestDateTime}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              תאריך ושעת בדיקת PM-CT
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="PMCTDateTime"
+              type="datetime-local"
+              placeholder=""
+              name="PMCTDateTime"
+              value={formData.PMCTDateTime}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              פענות PM-CT
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="PMCTInterpretation"
+              placeholder=""
+              name="PMCTInterpretation"
+              value={formData.PMCTInterpretation}
+              onChange={handleChange}
+              rows={5}
+            />
+          </div>
+
+        </div>
+      )}
+
+      {/* Main content area */}
+      <div className={`flex ${isSidebarVisible ? 'w-3/4' : 'w-full'}`}>
+        {/* Left column */}
+        <div className={`rounded-lg shadow-md m-6 p-4 ${isSidebarVisible ? 'w-1/2' : 'w-1/3'}`}>
+          {/* Toggle button */}
+          <button
+            onClick={toggleSidebar}
+            className=" bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded"
+          >
+            {isSidebarVisible ? '<<' : '>>'}
+          </button>
+
           <h1 className='text-xl border-b pb-2 mb-4'>מאפייני פציעות וטיפול</h1>
 
-          {/* map over injuries */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="type">
               סוג פציעה
@@ -359,7 +366,6 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChangeInjury}
               id='type'
             >
-              {/* create option from each injury type */}
               {injuryTypes.map((type, index) => (
                 <option key={index} value={type}>{type}</option>
               ))}
@@ -370,14 +376,14 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="injuries.description">
               תיאור פציעה
             </label>
-            <input
+            <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="injuries.description"
-              type="text"
               placeholder=""
               name="description"
               value={injuryFormData.description}
               onChange={handleChangeInjury}
+              rows={3}
             />
           </div>
           <div className="mb-4">
@@ -460,9 +466,9 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
 
           <h1 className='text-xl border-b pb-2 my-4'>רשימת פציעות</h1>
-          <ol className='list-decimal'>
+          <ol className='list-decimal mx-4'>
             {formData.injuries.map((injury: Injury, index: number) => (
-              <li key={index}>{`${injury.type} - ${injury.description} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}
+              <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}
                 <button
                   className='w-16 h-8 m-1 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
                   onClick={() => removeInjuryField(index)}>
@@ -474,18 +480,20 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
         </div>
 
-        <div className="flex flex-col w-1/3 rounded-lg shadow-md p-6 m-6">
-          <Canvas camera={{ position: [0, 25, 50], fov: 90 }}>
-            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
-          </Canvas>
+        {/* Right column */}
+        <div className={`rounded-lg shadow-md m-6 p-4 ${isSidebarVisible ? 'w-1/2' : 'w-2/3'}`}>
           <button
-            className="w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={(e) => handleSubmit(e)}
           >
             שמור חלל
           </button>
+          <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
+            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
+          </Canvas>
         </div>
       </div>
+
     </div>
   )
 }
