@@ -72,6 +72,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     localStorage.setItem('formSubmissions', JSON.stringify(updatedData))
     setSubmissions(updatedData);
     setFormData(initialFormData) // Reset form
+    setMarkers([])
   }
 
   // Add a new injury object
@@ -149,9 +150,9 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
         if (marked) {
           const prevMarkers = markers.slice(0, markers.length - 1);
-          setMarkers([...prevMarkers, { position: point }]);
+          setMarkers([...prevMarkers, { location: point }]);
         } else {
-          setMarkers([...markers, { position: point }]);
+          setMarkers([...markers, { location: point }]);
         }
 
         setMarked(true);
@@ -177,7 +178,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex" style={{height: "90vh"}}>
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
@@ -489,7 +490,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             שמור חלל
           </button>
           <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers}></HumanModel>
+            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers} onLoad={()=>console.log("loaded")}></HumanModel>
           </Canvas>
         </div>
       </div>

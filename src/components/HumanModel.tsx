@@ -1,22 +1,26 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three'
 import { ThreeEvent, useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
+import { Marker } from '../Interfaces';
 
 interface HumanModelProps {
   onClick: (event: ThreeEvent<MouseEvent>) => void;
   modelRef: React.Ref<THREE.Object3D>;
   markers: Marker[];
+  onLoad: () => void;
 }
 
-interface Marker {
-  position: THREE.Vector3;
-}
-
-const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) => {
+const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers, onLoad }) => {
 
   const scene = useLoader(FBXLoader, "male_body.fbx")
+
+  useEffect(() => {
+    if (scene) {
+      onLoad();
+    }
+  }, [scene, onLoad]);
 
   return (
     <>
@@ -39,7 +43,7 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers }) =
           receiveShadow />
 
         {markers && markers.map((marker, index) => (
-          <mesh key={index} position={marker.position}>
+          <mesh key={index} position={marker.location}>
             <sphereGeometry args={[0.5, 10, 10]} />
             <meshStandardMaterial color="red" />
           </mesh>

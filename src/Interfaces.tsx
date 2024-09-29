@@ -28,7 +28,7 @@ interface Submission {
 
 
 interface Marker {
-  position: THREE.Vector3;
+  location: THREE.Vector3;
 }
 
 export type { Submission, Injury, Marker }
