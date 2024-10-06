@@ -181,7 +181,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   };
 
   return (
-    <div className="flex" style={{height: "90vh"}}>
+    <div className="flex" style={{ height: "90vh" }}>
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
@@ -493,12 +493,12 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             שמור חלל
           </button>
           <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-          <ambientLight intensity={1} />
-      <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
-      <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
-      <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
-      <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
-            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers} onLoad={()=>console.log("loaded")}></HumanModel>
+            <ambientLight intensity={1} />
+            <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
+            <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
+            <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
+            <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
+            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers} onLoad={() => console.log("loaded")}></HumanModel>
           </Canvas>
         </div>
       </div>
