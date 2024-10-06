@@ -134,7 +134,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
       const { x, y, z } = e.point;
 
-      // normalize x, y, z to be between -1, 1
+      // // normalize x, y, z to be between -1, 1
       const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1
       const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1
       const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1
@@ -164,7 +164,10 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
         location: {
           x: fixedX,
           y: fixedY,
-          z: fixedZ
+          z: fixedZ,
+          // x: x,
+          // y: y,
+          // z: z
         }
       });
 
@@ -326,7 +329,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-              פענות PM-CT
+              פענוח PM-CT
             </label>
             <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -490,6 +493,11 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             שמור חלל
           </button>
           <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
+          <ambientLight intensity={1} />
+      <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
+      <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
+      <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
+      <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
             <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers} onLoad={()=>console.log("loaded")}></HumanModel>
           </Canvas>
         </div>

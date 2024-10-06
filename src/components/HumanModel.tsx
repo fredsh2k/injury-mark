@@ -21,15 +21,10 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers, onL
       onLoad();
     }
   }, [scene, onLoad]);
+  
 
   return (
     <>
-      <ambientLight intensity={1} />
-      <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
-      <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
-      <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
-      <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
-
       <OrbitControls
         enableZoom={true}
         minPolarAngle={0}
@@ -44,7 +39,7 @@ const HumanModel: React.FC<HumanModelProps> = ({ onClick, modelRef, markers, onL
 
         {markers && markers.map((marker, index) => (
           <mesh key={index} position={marker.location}>
-            <sphereGeometry args={[0.5, 10, 10]} />
+            <sphereGeometry args={[0.4]} />
             <meshStandardMaterial color="red" />
           </mesh>
         ))}

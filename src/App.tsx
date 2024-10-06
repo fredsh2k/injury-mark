@@ -12,6 +12,7 @@ function App() {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab)
     localStorage.setItem('activeTab', tab)
+    window.location.reload() // TODO: hack to force re-render, find a proper fix
   }
 
   return (
