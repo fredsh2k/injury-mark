@@ -16,7 +16,7 @@ function App() {
   }
 
   return (
-    <div className='rounded-lg shadow-md p-6 m-6'>
+    <div className='rounded-lg shadow-md p-1 m-1'>
 
       <div className='border-b'>
         <button
