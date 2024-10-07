@@ -181,16 +181,16 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   };
 
   return (
-    <div className="flex" style={{ height: "90vh" }}>
+    <div className="flex mb-4" style={{ height: "93vh" }}>
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
-        <div className="w-1/3 p-4 rounded-lg shadow-md m-6">
+        <div className="w-1/3 p-4 rounded-lg shadow-md">
 
-          <h1 className='text-xl pb-2 mb-4 border-b'>זיהוי החלל</h1>
+          <h1 className='text-xl pb-1 mb-1 border-b'>זיהוי החלל</h1>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               מספר אירוע מנפ"צ
             </label>
             <input
@@ -204,8 +204,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               מספר טראומה מנפ"צ
             </label>
             <input
@@ -219,8 +219,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               מספר נפגע במאנ"ח
             </label>
             <input
@@ -234,8 +234,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               תעודת זהות
             </label>
             <input
@@ -249,8 +249,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               מספר אישי
             </label>
             <input
@@ -264,8 +264,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               תאריך ושעת האירוע
             </label>
             <input
@@ -280,9 +280,9 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
           </div>
 
-          <h1 className='text-xl p-2 mb-4 border-b'>נתוני פטירה</h1>
+          <h1 className='text-xl p-2 mb-1 border-b'>נתוני פטירה</h1>
 
-          <div className="mb-4">
+          <div className="mb-1">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
               תאריך ושעת פטירה
             </label>
@@ -297,8 +297,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               תאריך ושעת בדיקה חיצונית
             </label>
             <input
@@ -312,8 +312,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               תאריך ושעת בדיקת PM-CT
             </label>
             <input
@@ -327,8 +327,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               פענוח PM-CT
             </label>
             <textarea
@@ -348,7 +348,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       {/* Main content area */}
       <div className={`flex ${isSidebarVisible ? 'w-3/4' : 'w-full'}`}>
         {/* Left column */}
-        <div className={`rounded-lg shadow-md m-6 p-4 ${isSidebarVisible ? 'w-1/2' : 'w-1/3'}`}>
+        <div className={`rounded-lg shadow-md mx-4 p-2 ${isSidebarVisible ? 'w-1/2' : 'w-1/3'}`}>
           {/* Toggle button */}
           <button
             onClick={toggleSidebar}
@@ -359,8 +359,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
           <h1 className='text-xl border-b pb-2 mb-4'>מאפייני פציעות וטיפול</h1>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="type">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="type">
               סוג פציעה
             </label>
             <select
@@ -376,8 +376,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             </select>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="injuries.description">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="injuries.description">
               תיאור פציעה
             </label>
             <textarea
@@ -390,8 +390,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               rows={3}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="selectedLocation">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="selectedLocation">
               בחירת מיקום
             </label>
             <select
@@ -408,11 +408,11 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             </select>
           </div>
 
-          <h1 className="block text-gray-700 text-sm font-bold mb-2">
+          <h1 className="block text-gray-700 text-sm font-bold mb-1">
             סימון מיקום
           </h1>
 
-          <div className="flex flex-row mb-4">
+          <div className="flex flex-row mb-1">
 
             <label className="text-gray-700 font-bold" htmlFor="location.x">x</label>
             <input
@@ -448,8 +448,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
               רדיוס (ס"מ)
             </label>
             <input
@@ -463,7 +463,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <button
-            className='w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6'
+            className='w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-1'
             onClick={addInjuryField}>
             הוסף פציעה
           </button>
@@ -478,6 +478,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                   onClick={() => removeInjuryField(index)}>
                   הסר
                 </button>
+                <hr></hr>
               </li>
             ))}
           </ol>
@@ -485,7 +486,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
         </div>
 
         {/* Right column */}
-        <div className={`rounded-lg shadow-md m-6 p-4 ${isSidebarVisible ? 'w-1/2' : 'w-2/3'}`}>
+        <div className={`rounded-lg shadow-md p-4 ${isSidebarVisible ? 'w-1/2' : 'w-2/3'}`}>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={(e) => handleSubmit(e)}
