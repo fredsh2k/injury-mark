@@ -259,6 +259,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             className="shadow appearance-none border rounded w-1/4 px-3 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             type="number"
             name="radius"
+            // increment by 0.5 on each change
+            step={0.5}
             value={(injuryFormData as RadiusInjury).radius}
             onChange={handleChangeInjury}
           />
@@ -625,7 +627,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onLoad={() => console.log("loaded")}
               temporaryVertices={temporaryVertices}
               isDrawingPolygon={currentInjuryType === 'polygon'}
-              currentRadius={Number((injuryFormData as RadiusInjury).radius) || 0.4}
+              currentRadius={Number((injuryFormData as RadiusInjury).radius)*0.5 || 0.1}
             />
           </Canvas>
         </div>

@@ -22,7 +22,7 @@ const HumanModel: React.FC<HumanModelProps> = ({
   onLoad,
   temporaryVertices = [],
   isDrawingPolygon = false,
-  currentRadius = 0.4
+  currentRadius = 1
 }) => {
   const scene = useLoader(FBXLoader, "male_body.fbx");
 
