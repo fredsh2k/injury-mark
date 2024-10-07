@@ -1,9 +1,10 @@
-import { Canvas, ThreeEvent } from "@react-three/fiber";
-import * as THREE from 'three';
-import HumanModel from "./HumanModel";
-import { Injury, Marker, Submission } from "../Interfaces";
 import { useEffect, useRef, useState } from "react";
+import * as THREE from 'three';
+import { Canvas, ThreeEvent } from "@react-three/fiber";
+
+import { Injury, Marker, Submission, RadiusInjury, PolygonInjury } from "../Interfaces";
 import { injuryTypes, selectedLocations } from "../Constants";
+import HumanModel from "./HumanModel";
 
 const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>> }) => {
 
@@ -21,23 +22,41 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     injuries: []
   }
 
-  const initialInjury = { type: injuryTypes[0], description: '', selectedLocation: selectedLocations[0], location: { x: 0, y: 0, z: 0 }, radius: 0 }
+  const initialRadiusInjury: RadiusInjury = {
+    type: injuryTypes[0],
+    description: '',
+    selectedLocation: selectedLocations[0],
+    location: { x: 0, y: 0, z: 0 },
+    radius: 0,
+    injuryType: 'radius'
+  }
+
+  const initialPolygonInjury: PolygonInjury = {
+    type: injuryTypes[0],
+    description: '',
+    selectedLocation: selectedLocations[0],
+    location: { x: 0, y: 0, z: 0 },
+    vertices: [],
+    injuryType: 'polygon'
+  }
 
   const [formData, setFormData] = useState<Submission>(initialFormData);
-  const [injuryFormData, setInjuryFormData] = useState(initialInjury);
+  const [currentInjuryType, setCurrentInjuryType] = useState<'radius' | 'polygon'>('radius');
+  const [injuryFormData, setInjuryFormData] = useState<RadiusInjury | PolygonInjury>(initialRadiusInjury);
   const [markers, setMarkers] = useState<Marker[]>([]);
+  const [isDrawingPolygon, setIsDrawingPolygon] = useState(false);
+  const [temporaryVertices, setTemporaryVertices] = useState<THREE.Vector3[]>([]);
   const [marked, setMarked] = useState(false);
-  const [, setDimensions] = useState({ min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } })
-  const [isLoaded] = useState(false)
+  const [, setDimensions] = useState({ min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } });
+  const [isLoaded] = useState(false);
 
   const modelRef = useRef<THREE.Group>(null);
 
   const handleChangeInjury = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
-    // if name contains location, take the last part of the string and set it as the key
     if (name.includes('location')) {
-      const locationField = name.split('.').pop()
+      const locationField = name.split('.').pop();
       setInjuryFormData({
         ...injuryFormData,
         location: {
@@ -45,14 +64,22 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           [locationField as string]: value
         }
       });
-      return
+      return;
     }
 
     setInjuryFormData({
       ...injuryFormData,
       [name]: value,
     });
+  }
 
+  const handleInjuryTypeChange = (type: 'radius' | 'polygon') => {
+    setCurrentInjuryType(type);
+    setInjuryFormData(type === 'radius' ? initialRadiusInjury : initialPolygonInjury);
+    setMarkers([]);
+    setTemporaryVertices([]);
+    setIsDrawingPolygon(false);
+    setMarked(false);
   }
 
   // Handle form input changes
@@ -125,52 +152,55 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    // Get the mouse coordinates in 3D space
-    e.stopPropagation(); // Prevent event from propagating to parent elements
+    e.stopPropagation();
 
     if (modelRef.current) {
       const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
-      const { min, max } = boundingBox
+      const { min, max } = boundingBox;
 
       const { x, y, z } = e.point;
+      const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1;
+      const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1;
+      const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1;
 
-      // // normalize x, y, z to be between -1, 1
-      const normalizedX = (x - min.x) / (max.x - min.x) * 2 - 1
-      const normalizedY = (y - min.y) / (max.y - min.y) * 2 - 1
-      const normalizedZ = (z - min.z) / (max.z - min.z) * 2 - 1
-
-      const fixedX = parseFloat(normalizedX.toFixed(4))
-      const fixedY = parseFloat(normalizedY.toFixed(4))
-      const fixedZ = parseFloat(normalizedZ.toFixed(4))
-
+      const fixedX = parseFloat(normalizedX.toFixed(4));
+      const fixedY = parseFloat(normalizedY.toFixed(4));
+      const fixedZ = parseFloat(normalizedZ.toFixed(4));
 
       const intersect = e.intersections[0];
       if (intersect) {
         const point = intersect.point;
 
-        if (marked) {
-          const prevMarkers = markers.slice(0, markers.length - 1);
-          setMarkers([...prevMarkers, { location: point }]);
-        } else {
+        if (currentInjuryType === 'radius') {
+          if (marked) {
+            const prevMarkers = markers.slice(0, markers.length - 1);
+            setMarkers([...prevMarkers, { location: point }]);
+          } else {
+            setMarkers([...markers, { location: point }]);
+          }
+          setMarked(true);
+        } else if (currentInjuryType === 'polygon') {
+          setTemporaryVertices([...temporaryVertices, point]);
           setMarkers([...markers, { location: point }]);
         }
 
-        setMarked(true);
-
+        setInjuryFormData({
+          ...injuryFormData,
+          location: { x: fixedX, y: fixedY, z: fixedZ }
+        });
       }
+    }
+  };
 
+
+  const finishPolygon = () => {
+    if (temporaryVertices.length >= 3) {
       setInjuryFormData({
-        ...injuryFormData,
-        location: {
-          x: fixedX,
-          y: fixedY,
-          z: fixedZ,
-          // x: x,
-          // y: y,
-          // z: z
-        }
+        ...injuryFormData as PolygonInjury,
+        vertices: temporaryVertices
       });
-
+      setIsDrawingPolygon(false);
+      setTemporaryVertices([]);
     }
   };
 
@@ -178,6 +208,64 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
+  };
+
+  // Add the injury type selector to your JSX
+  const renderInjuryTypeSelector = () => (
+    <div className="mb-4">
+      <label className="block text-gray-700 text-sm font-bold mb-2">
+        סוג סימון
+      </label>
+      <div className="flex space-x-4">
+        <button
+          className={`px-4 py-2 rounded ${currentInjuryType === 'radius' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => handleInjuryTypeChange('radius')}
+        >
+          סימון רדיוס
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${currentInjuryType === 'polygon' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => handleInjuryTypeChange('polygon')}
+        >
+          סימון פוליגון
+        </button>
+      </div>
+    </div>
+  );
+
+  // Modify your existing form to conditionally render radius or polygon specific inputs
+  const renderInjurySpecificInputs = () => {
+    if (currentInjuryType === 'radius') {
+      return (
+        <div className="mb-1">
+          <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="radius">
+            רדיוס (ס"מ)
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-1/4 px-3 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            type="number"
+            name="radius"
+            value={(injuryFormData as RadiusInjury).radius}
+            onChange={handleChangeInjury}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className="mb-1">
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+            onClick={finishPolygon}
+            disabled={temporaryVertices.length < 3}
+          >
+            סיים פוליגון
+          </button>
+          <span className="text-sm text-gray-600">
+            {temporaryVertices.length} נקודות נבחרו
+          </span>
+        </div>
+      );
+    }
   };
 
   return (
@@ -359,6 +447,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
           <h1 className='text-xl border-b pb-1 mb-4'>מאפייני פציעות וטיפול</h1>
 
+
+
           <div className="mb-1">
             <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="type">
               סוג פציעה
@@ -416,6 +506,9 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               לחיצה על המודל תזין את המיקום. כל קואורדינטה מסמלת את המרחק היחסי ממרכז המודל בטווח [1,1-]
             </div>
           </div>
+
+          {renderInjuryTypeSelector()}
+          {renderInjurySpecificInputs()}
 
           <div className="flex flex-row mb-1">
 
@@ -499,13 +592,21 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             שמור חלל
           </button>
           <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-            <ambientLight intensity={1} />
-            <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
-            <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
-            <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
-            <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
-            <HumanModel onClick={handleClick} modelRef={modelRef} markers={markers} onLoad={() => console.log("loaded")}></HumanModel>
-          </Canvas>
+    <ambientLight intensity={1} />
+    <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
+    <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
+    <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
+    <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
+    <HumanModel 
+      onClick={handleClick} 
+      modelRef={modelRef} 
+      markers={markers} 
+      onLoad={() => console.log("loaded")}
+      temporaryVertices={temporaryVertices}
+      isDrawingPolygon={currentInjuryType === 'polygon'}
+      currentRadius={Number((injuryFormData as RadiusInjury).radius) || 0.4}
+    />
+  </Canvas>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-interface Injury {
+interface BaseInjury {
   type: string
   description: string
   selectedLocation: string
@@ -9,8 +9,19 @@ interface Injury {
     y: number
     z: number
   }
+}
+
+interface RadiusInjury extends BaseInjury {
+  injuryType: 'radius'
   radius: number
 }
+
+interface PolygonInjury extends BaseInjury {
+  injuryType: 'polygon'
+  vertices: THREE.Vector3[]
+}
+
+type Injury = RadiusInjury | PolygonInjury
 
 interface Submission {
   manpatzIncidentNumber: string
@@ -31,4 +42,4 @@ interface Marker {
   location: THREE.Vector3;
 }
 
-export type { Submission, Injury, Marker }
+export type { Submission, Injury, Marker, RadiusInjury, PolygonInjury }
