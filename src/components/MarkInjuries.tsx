@@ -185,7 +185,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
-        <div className="w-1/3 p-4 rounded-lg shadow-md">
+        <div className="w-1/3 py-1 px-4 rounded-lg shadow-md">
 
           <h1 className='text-xl pb-1 mb-1 border-b'>זיהוי החלל</h1>
 
@@ -412,8 +412,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             <h1 className="block text-gray-700 text-sm font-bold mb-1">
               סימון מיקום <span className="ml-2">(i)</span>
             </h1>
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/4 mb-2 hidden group-hover:block w-128 bg-black text-white text-xs rounded py-2 px-3">
-              לחיצה על המודל תזין את המיקום. כל קוארדינטה מסמלת את המרחק היחסי מראשית הצירים בטווח [1,1-]
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/4 mb-2 hidden group-hover:block w-2/3 bg-black text-white text-xs rounded py-2 px-3">
+              לחיצה על המודל תזין את המיקום. כל קואורדינטה מסמלת את המרחק היחסי ממרכז המודל בטווח [1,1-]
             </div>
           </div>
 
