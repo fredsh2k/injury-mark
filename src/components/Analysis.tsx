@@ -129,7 +129,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
 
 
   return (
-    <div style={{ height: "90vh" }}>
+    <div style={{ height: "93vh" }}>
       <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
         <Suspense fallback={null}>
           <ambientLight intensity={0.5}  />

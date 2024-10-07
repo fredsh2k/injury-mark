@@ -352,19 +352,19 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           {/* Toggle button */}
           <button
             onClick={toggleSidebar}
-            className=" bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded"
+            className=" bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded font-bold"
           >
             {isSidebarVisible ? '<<' : '>>'}
           </button>
 
-          <h1 className='text-xl border-b pb-2 mb-4'>מאפייני פציעות וטיפול</h1>
+          <h1 className='text-xl border-b pb-1 mb-4'>מאפייני פציעות וטיפול</h1>
 
           <div className="mb-1">
             <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="type">
               סוג פציעה
             </label>
             <select
-              className="w-full py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-1/2 py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               name="type"
               value={injuryFormData.type}
               onChange={handleChangeInjury}
@@ -395,7 +395,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               בחירת מיקום
             </label>
             <select
-              className="w-full py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-1/3 py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               name="selectedLocation"
               value={injuryFormData.selectedLocation}
               onChange={handleChangeInjury}
@@ -408,13 +408,18 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             </select>
           </div>
 
-          <h1 className="block text-gray-700 text-sm font-bold mb-1">
-            סימון מיקום
-          </h1>
+          <div className="relative group">
+            <h1 className="block text-gray-700 text-sm font-bold mb-1">
+              סימון מיקום <span className="ml-2">(i)</span>
+            </h1>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/4 mb-2 hidden group-hover:block w-128 bg-black text-white text-xs rounded py-2 px-3">
+              לחיצה על המודל תזין את המיקום. כל קוארדינטה מסמלת את המרחק היחסי מראשית הצירים בטווח [1,1-]
+            </div>
+          </div>
 
           <div className="flex flex-row mb-1">
 
-            <label className="text-gray-700 font-bold" htmlFor="location.x">x</label>
+            <label className="text-gray-700 font-bold mt-2" htmlFor="location.x">x</label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="number"
@@ -425,7 +430,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChangeInjury}
             />
 
-            <label className="text-gray-700 font-bold" htmlFor="location.y">y</label>
+            <label className="text-gray-700 font-bold mt-2" htmlFor="location.y">y</label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="number"
@@ -436,7 +441,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChangeInjury}
             />
 
-            <label className="text-gray-700 font-bold" htmlFor="location.z">z</label>
+            <label className="text-gray-700 font-bold mt-2" htmlFor="location.z">z</label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="number"
@@ -453,7 +458,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               רדיוס (ס"מ)
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-1/4 px-3 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="number"
               placeholder=""
               name="radius"
@@ -469,7 +474,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </button>
 
 
-          <h1 className='text-xl border-b pb-2 my-4'>רשימת פציעות</h1>
+          <h1 className='text-xl border-b pb-1 my-1'>רשימת פציעות</h1>
           <ol className='list-decimal mx-4'>
             {formData.injuries.map((injury: Injury, index: number) => (
               <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} - (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}

@@ -143,7 +143,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
   };
 
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col' style={{height: "93vh"}}>
       <div className='flex flex-row'>
         {/* <button
           className="w-32 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
@@ -153,18 +153,18 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
         </button> */}
         <button 
               onClick={handleCSVDownload}
-              className="w-32 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+              className="w-36 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
             >
-              הורדת נתונים 
+              הורדת נתונים
             </button>
         <button
-          className="w-32 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+          className="w-36 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
           onClick={handleUpload}
         >
           העלאת נתונים
         </button>
         <button
-          className="w-32 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+          className="w-36 bg-red-500 hover:bg-red-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
           onClick={handleDelete}
         >
           הסרת נתונים
@@ -176,30 +176,30 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
       <table>
         <thead className='bg-gray-100'>
           <tr className='border border-gray-300'>
-            <th>מספר אירוע מנפ"צ</th>
-            <th>מספר טראומה מנפ"צ</th>
-            <th>מספר נפגע במאנ"ח</th>
-            <th>תאריך ושעת האירוע</th>
-            <th>תאריך ושעת פטירה</th>
-            <th>תאריך ושעת בדיקה חיצונית</th>
-            <th>תאריך ושעת בדיקת PM-CT</th>
-            <th>פענות PM-CT</th>
-            <th>פציעות</th>
-            <th>הסרה</th>
+            <th className="border border-gray-300 w-32">מספר אירוע מנפ"צ</th>
+            <th className="border border-gray-300 w-32">מספר טראומה מנפ"צ</th>
+            <th className="border border-gray-300 w-32">מספר נפגע במאנ"ח</th>
+            {/* <th className="border border-gray-300">תאריך ושעת האירוע</th>
+            <th className="border border-gray-300">תאריך ושעת פטירה</th>
+            <th className="border border-gray-300">תאריך ושעת בדיקה חיצונית</th>
+            <th className="border border-gray-300">תאריך ושעת בדיקת PM-CT</th>
+            <th className="border border-gray-300">פענות PM-CT</th> */}
+            <th className="border border-gray-300">פציעות</th>
+            <th className="border border-gray-300 w-20">הסרה</th>
           </tr>
         </thead>
         <tbody>
           {submissions.map((submission: Submission, index: number) => (
             <tr key={index} className='border border-gray-300 hover:bg-gray-100'>
               <td className="px-4">{submission.manpatzIncidentNumber}</td>
-              <td>{submission.manpatzTraumaNumber}</td>
-              <td>{submission.maanahCasualtyNumber}</td>
-              <td>{submission.incidentDateTime}</td>
-              <td>{submission.demiseDateTime}</td>
-              <td>{submission.externalTestDateTime}</td>
-              <td>{submission.PMCTDateTime}</td>
-              <td>{submission.PMCTInterpretation}</td>
-              <td>
+              <td className="border border-gray-300">{submission.manpatzTraumaNumber}</td>
+              <td className="border border-gray-300">{submission.maanahCasualtyNumber}</td>
+              {/* <td className="border border-gray-300">{submission.incidentDateTime}</td>
+              <td className="border border-gray-300">{submission.demiseDateTime}</td>
+              <td className="border border-gray-300">{submission.externalTestDateTime}</td>
+              <td className="border border-gray-300">{submission.PMCTDateTime}</td>
+              <td className="border border-gray-300">{submission.PMCTInterpretation}</td> */}
+              <td className="border border-gray-300 mx-6 px-6">
                 <ul className='list-decimal'>
                   {submission.injuries.map((injury, index) => (
                     <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} (${injury.location.x} ${injury.location.y} ${injury.location.z}) - ${injury.radius}`}</li>
@@ -209,7 +209,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
               <td>
                 {/* row delete button */}
                 <button
-                  className='mx-2 w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  className='mr-2 w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
                   onClick={() => handleRowDelete(index)}
                 >
                   הסר
