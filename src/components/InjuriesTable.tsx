@@ -33,6 +33,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
         externalTestDateTime: submission.externalTestDateTime,
         PMCTDateTime: submission.PMCTDateTime,
         PMCTInterpretation: submission.PMCTInterpretation,
+        protectionMeans: (submission.protectionMeans && submission.protectionMeans.length > 0) ? submission.protectionMeans.join(', ') : '',
         injuryType: injury.type,
         injuryDescription: injury.description,
         injuryLocation: injury.selectedLocation,
@@ -64,7 +65,12 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
           PMCTInterpretation: row.PMCTInterpretation,
           injuries: [],
           id: "",
-          personalNumber: ""
+          personalNumber: "",
+          protectionMeans: Array.isArray(row.protectionMeans)
+            ? row.protectionMeans
+            : typeof row.protectionMeans === 'string' && row.protectionMeans.trim().length > 0
+              ? row.protectionMeans.split(',').map((s: string) => s.trim())
+              : [],
         });
       }
 
@@ -213,6 +219,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
             <th className="border border-gray-300">תאריך ושעת בדיקה חיצונית</th>
             <th className="border border-gray-300">תאריך ושעת בדיקת PM-CT</th>
             <th className="border border-gray-300">פענות PM-CT</th> */}
+            <th className="border border-gray-300 w-48">אמצעי מיגון</th>
             <th className="border border-gray-300">פציעות</th>
             <th className="border border-gray-300 w-2">הסרה</th>
           </tr>
@@ -228,6 +235,7 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
               <td className="border border-gray-300">{submission.externalTestDateTime}</td>
               <td className="border border-gray-300">{submission.PMCTDateTime}</td>
               <td className="border border-gray-300">{submission.PMCTInterpretation}</td> */}
+              <td className="border border-gray-300">{(submission.protectionMeans && submission.protectionMeans.length > 0) ? submission.protectionMeans.join(', ') : ''}</td>
               <td className="border border-gray-300 mx-6 px-6">
                 <ul className='list-decimal'>
                   {submission.injuries.map((injury, index) => (

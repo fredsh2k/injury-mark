@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 
 import { Injury, Marker, Submission, RadiusInjury, PolygonInjury } from "../Interfaces";
-import { injuryTypes, selectedLocations } from "../Constants";
+import { injuryTypes, selectedLocations, protectionMeans } from "../Constants";
 import HumanModel from "./HumanModel";
 
 const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>> }) => {
@@ -19,7 +19,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     externalTestDateTime: '',
     PMCTDateTime: '',
     PMCTInterpretation: '',
-    injuries: []
+    injuries: [],
+    protectionMeans: [] as string[],
   }
 
   const initialRadiusInjury: RadiusInjury = {
@@ -325,17 +326,31 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     }
   };
 
+  // Remove the old multi-select handler and add a checkbox handler
+  const handleProtectionMeansCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let updated: string[];
+    if (e.target.checked) {
+      updated = [...formData.protectionMeans, value];
+    } else {
+      updated = formData.protectionMeans.filter((item) => item !== value);
+    }
+    setFormData({
+      ...formData,
+      protectionMeans: updated,
+    });
+  }
+
   return (
     <div className="flex mb-4" style={{ height: "93vh" }}>
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
         <div className="w-1/3 py-1 px-4 rounded-lg shadow-md">
-
           <h1 className='text-xl pb-1 mb-1 border-b'>זיהוי החלל</h1>
-
+          {/* ...existing identification fields... */}
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzIncidentNumber">
               מספר אירוע מנפ"צ
             </label>
             <input
@@ -350,7 +365,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzTraumaNumber">
               מספר טראומה מנפ"צ
             </label>
             <input
@@ -365,7 +380,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="maanahCasualtyNumber">
               מספר נפגע במאנ"ח
             </label>
             <input
@@ -380,7 +395,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="id">
               תעודת זהות
             </label>
             <input
@@ -395,7 +410,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="personalNumber">
               מספר אישי
             </label>
             <input
@@ -410,7 +425,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="incidentDateTime">
               תאריך ושעת האירוע
             </label>
             <input
@@ -428,7 +443,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <h1 className='text-xl p-2 mb-1 border-b'>נתוני פטירה</h1>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="demiseDateTime">
               תאריך ושעת פטירה
             </label>
             <input
@@ -443,7 +458,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="externalTestDateTime">
               תאריך ושעת בדיקה חיצונית
             </label>
             <input
@@ -458,7 +473,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTDateTime">
               תאריך ושעת בדיקת PM-CT
             </label>
             <input
@@ -473,7 +488,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           </div>
 
           <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
+            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTInterpretation">
               פענוח PM-CT
             </label>
             <textarea
@@ -485,6 +500,27 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               onChange={handleChange}
               rows={5}
             />
+          </div>
+
+          {/* Replace multi-select with checkboxes for protectionMeans */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-1">
+              אמצעי מיגון
+            </label>
+            <div className="flex flex-col gap-1 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              {protectionMeans.map((item) => (
+                <label key={item} className="flex items-center mb-1">
+                  <input
+                    type="checkbox"
+                    value={item}
+                    checked={formData.protectionMeans.includes(item)}
+                    onChange={handleProtectionMeansCheckbox}
+                    className="form-checkbox h-4 w-4 text-blue-600 ml-1"
+                  />
+                  <span>{item}</span>
+                </label>
+              ))}
+            </div>
           </div>
 
         </div>

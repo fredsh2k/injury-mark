@@ -1,3 +1,13 @@
+const protectionMeans = [
+  'ברכיות',
+  'כפפות',
+  'מיגון קרמי',
+  'מסיכת פנים',
+  'משקפי מגן',
+  'קסדה',
+  'שכפ"צ'
+];
+
 const selectedLocations = [
   'אחר',
   'אגן',
@@ -76,4 +86,6 @@ const injuryTypes = [
   'פרוצדורה רפואית פולשנית - נידל',
 ];
 
-export { selectedLocations, injuryTypes }
+
+
+export { selectedLocations, injuryTypes, protectionMeans }

@@ -35,6 +35,7 @@ interface Submission {
   PMCTDateTime: string
   PMCTInterpretation: string
   injuries: Injury[]
+  protectionMeans: string[]
 }
 
 
