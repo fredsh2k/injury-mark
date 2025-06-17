@@ -111,13 +111,17 @@ const HumanModel: React.FC<HumanModelProps> = ({
     shape.lineTo(temporaryVertices[0].x, temporaryVertices[0].y);
 
     return (
-      <mesh position={[0, 0, temporaryVertices[0].z]}>
+      <mesh
+        position={[0, 0, temporaryVertices[0].z]}
+        renderOrder={1}
+      >
         <shapeGeometry args={[shape]} />
         <meshBasicMaterial 
           color="red" 
           transparent={true} 
           opacity={0.2} 
           side={THREE.DoubleSide}
+          depthTest={false}
         />
       </mesh>
     );
