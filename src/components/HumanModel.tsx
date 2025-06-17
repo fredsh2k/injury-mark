@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { ThreeEvent, useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { Marker } from '../Interfaces';
+import { useRef } from 'react';
 
 interface HumanModelProps {
   onClick: (event: ThreeEvent<MouseEvent>) => void;
@@ -25,6 +26,10 @@ const HumanModel: React.FC<HumanModelProps> = ({
   currentRadius = 1
 }) => {
   const scene = useLoader(FBXLoader, "male_body.fbx");
+
+  // Track pointer state to distinguish click vs drag
+  const pointerDownPos = useRef<{x: number, y: number} | null>(null);
+  const dragThreshold = 5; // px
 
   useEffect(() => {
     if (scene) {
@@ -118,6 +123,24 @@ const HumanModel: React.FC<HumanModelProps> = ({
     );
   };
 
+
+  // Only call onClick if not a drag
+  const handlePointerDown = (e: any) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = (e: any) => {
+    if (!pointerDownPos.current) return;
+    const dx = e.clientX - pointerDownPos.current.x;
+    const dy = e.clientY - pointerDownPos.current.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    pointerDownPos.current = null;
+    if (dist < dragThreshold) {
+      // Only treat as click if pointer didn't move much
+      onClick(e);
+    }
+  };
+
   return (
     <>
       <OrbitControls
@@ -133,7 +156,8 @@ const HumanModel: React.FC<HumanModelProps> = ({
           position={[0, 0, 0]} 
           scale={[5, 5, 5]} 
           zoom={10}
-          onPointerDown={onClick}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
           receiveShadow 
         />
         {renderMarkers()}
