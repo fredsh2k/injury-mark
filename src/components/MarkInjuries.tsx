@@ -104,14 +104,18 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   // Add a new injury object
   const addInjuryField = () => {
     const updatedInjuries = [...formData.injuries, injuryFormData];
-    console.log({ updatedInjuries })
     setFormData({
       ...formData,
       injuries: updatedInjuries,
     });
-    // reset injury form
-    setInjuryFormData(initialRadiusInjury);
-    setCurrentInjuryType('radius');
+    // reset injury form, but keep the current type
+    if (currentInjuryType === 'radius') {
+      setInjuryFormData(initialRadiusInjury);
+    } else {
+      setInjuryFormData(initialPolygonInjury);
+    }
+
+    // do not reset currentInjuryType
 
     // reset marker
     setMarkers([]);
@@ -119,7 +123,6 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
     // reset polygon
     setTemporaryVertices([]);
-
   };
 
   // Remove an injury input field
