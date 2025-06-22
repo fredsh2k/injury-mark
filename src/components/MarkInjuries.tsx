@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from 'three';
 import { Canvas, ThreeEvent } from "@react-three/fiber";
-import { Disclosure } from '@headlessui/react';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 
 import { Injury, Marker, Submission, RadiusInjury, PolygonInjury } from "../Interfaces";
@@ -357,15 +357,15 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
                   <span className="text-xl font-bold">זיהוי החלל</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-purple-500`}
+                    } h-5 w-5 text-white`}
                   />
-                </Disclosure.Button>
-                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                </DisclosureButton>
+                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                   <div className="mb-1">
                     <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzIncidentNumber">
                       מספר אירוע מנפ"צ
@@ -455,7 +455,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                       onChange={handleChange}
                     />
                   </div>
-                </Disclosure.Panel>
+                </DisclosurePanel>
               </>
             )}
           </Disclosure>
@@ -464,15 +464,15 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-blue-100 px-4 py-2 text-left text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
+                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
                   <span className="text-xl font-bold">נתוני פטירה</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-blue-500`}
+                    } h-5 w-5 text-white`}
                   />
-                </Disclosure.Button>
-                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                </DisclosureButton>
+                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                   <div className="mb-1">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="demiseDateTime">
                       תאריך ושעת פטירה
@@ -532,7 +532,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                       rows={5}
                     />
                   </div>
-                </Disclosure.Panel>
+                </DisclosurePanel>
               </>
             )}
           </Disclosure>
@@ -541,15 +541,15 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-green-100 px-4 py-2 text-left text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring focus-visible:ring-green-500 focus-visible:ring-opacity-75 mt-2">
+                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
                   <span className="text-xl font-bold">אמצעי מיגון</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-green-500`}
+                    } h-5 w-5 text-white`}
                   />
-                </Disclosure.Button>
-                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                </DisclosureButton>
+                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                   <div className="flex flex-col gap-1 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     {protectionMeans.map((item) => (
                       <label key={item} className="flex items-center mb-1">
@@ -564,7 +564,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                       </label>
                     ))}
                   </div>
-                </Disclosure.Panel>
+                </DisclosurePanel>
               </>
             )}
           </Disclosure>
