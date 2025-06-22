@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from 'three';
 import { Canvas, ThreeEvent } from "@react-three/fiber";
+import { Disclosure } from '@headlessui/react';
+import { ChevronUpIcon } from '@heroicons/react/20/solid';
 
 import { Injury, Marker, Submission, RadiusInjury, PolygonInjury } from "../Interfaces";
 import { injuryTypes, selectedLocations, protectionMeans } from "../Constants";
@@ -349,182 +351,223 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
-        <div className="w-1/3 py-1 px-4 rounded-lg shadow-md">
-          <h1 className='text-xl pb-1 mb-1 border-b'>זיהוי החלל</h1>
-          {/* ...existing identification fields... */}
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzIncidentNumber">
-              מספר אירוע מנפ"צ
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="manpatzIncidentNumber"
-              type="text"
-              placeholder=""
-              name="manpatzIncidentNumber"
-              value={formData.manpatzIncidentNumber}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzTraumaNumber">
-              מספר טראומה מנפ"צ
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="manpatzTraumaNumber"
-              type="text"
-              placeholder=""
-              name="manpatzTraumaNumber"
-              value={formData.manpatzTraumaNumber}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="maanahCasualtyNumber">
-              מספר נפגע במאנ"ח
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="maanahCasualtyNumber"
-              type="text"
-              placeholder=""
-              name="maanahCasualtyNumber"
-              value={formData.maanahCasualtyNumber}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="id">
-              תעודת זהות
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="id"
-              type="text"
-              placeholder=""
-              name="id"
-              value={formData.id}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="personalNumber">
-              מספר אישי
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="personalNumber"
-              type="text"
-              placeholder=""
-              name="personalNumber"
-              value={formData.personalNumber}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="incidentDateTime">
-              תאריך ושעת האירוע
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="incidentDateTime"
-              type="datetime-local"
-              placeholder=""
-              name="incidentDateTime"
-              value={formData.incidentDateTime}
-              onChange={handleChange}
-            />
-
-          </div>
-
-          <h1 className='text-xl p-2 mb-1 border-b'>נתוני פטירה</h1>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="demiseDateTime">
-              תאריך ושעת פטירה
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="demiseDateTime"
-              type="datetime-local"
-              placeholder=""
-              name="demiseDateTime"
-              value={formData.demiseDateTime}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="externalTestDateTime">
-              תאריך ושעת בדיקה חיצונית
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="externalTestDateTime"
-              type="datetime-local"
-              placeholder=""
-              name="externalTestDateTime"
-              value={formData.externalTestDateTime}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTDateTime">
-              תאריך ושעת בדיקת PM-CT
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="PMCTDateTime"
-              type="datetime-local"
-              placeholder=""
-              name="PMCTDateTime"
-              value={formData.PMCTDateTime}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTInterpretation">
-              פענוח PM-CT
-            </label>
-            <textarea
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="PMCTInterpretation"
-              placeholder=""
-              name="PMCTInterpretation"
-              value={formData.PMCTInterpretation}
-              onChange={handleChange}
-              rows={5}
-            />
-          </div>
-
-          {/* Replace multi-select with checkboxes for protectionMeans */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-1">
-              אמצעי מיגון
-            </label>
-            <div className="flex flex-col gap-1 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              {protectionMeans.map((item) => (
-                <label key={item} className="flex items-center mb-1">
-                  <input
-                    type="checkbox"
-                    value={item}
-                    checked={formData.protectionMeans.includes(item)}
-                    onChange={handleProtectionMeansCheckbox}
-                    className="form-checkbox h-4 w-4 text-blue-600 ml-1"
+        <div className="w-1/3 py-1 px-4 rounded-lg shadow-md overflow-y-auto">
+          
+          {/* זיהוי החלל Section */}
+          <Disclosure defaultOpen>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                  <span className="text-xl font-bold">זיהוי החלל</span>
+                  <ChevronUpIcon
+                    className={`${
+                      open ? 'rotate-180 transform' : ''
+                    } h-5 w-5 text-purple-500`}
                   />
-                  <span>{item}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+                </Disclosure.Button>
+                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzIncidentNumber">
+                      מספר אירוע מנפ"צ
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="manpatzIncidentNumber"
+                      type="text"
+                      placeholder=""
+                      name="manpatzIncidentNumber"
+                      value={formData.manpatzIncidentNumber}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzTraumaNumber">
+                      מספר טראומה מנפ"צ
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="manpatzTraumaNumber"
+                      type="text"
+                      placeholder=""
+                      name="manpatzTraumaNumber"
+                      value={formData.manpatzTraumaNumber}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="maanahCasualtyNumber">
+                      מספר נפגע במאנ"ח
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="maanahCasualtyNumber"
+                      type="text"
+                      placeholder=""
+                      name="maanahCasualtyNumber"
+                      value={formData.maanahCasualtyNumber}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="id">
+                      תעודת זהות
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="id"
+                      type="text"
+                      placeholder=""
+                      name="id"
+                      value={formData.id}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="personalNumber">
+                      מספר אישי
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="personalNumber"
+                      type="text"
+                      placeholder=""
+                      name="personalNumber"
+                      value={formData.personalNumber}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="incidentDateTime">
+                      תאריך ושעת האירוע
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="incidentDateTime"
+                      type="datetime-local"
+                      placeholder=""
+                      name="incidentDateTime"
+                      value={formData.incidentDateTime}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+
+          {/* נתוני פטירה Section */}
+          <Disclosure defaultOpen>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-blue-100 px-4 py-2 text-left text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
+                  <span className="text-xl font-bold">נתוני פטירה</span>
+                  <ChevronUpIcon
+                    className={`${
+                      open ? 'rotate-180 transform' : ''
+                    } h-5 w-5 text-blue-500`}
+                  />
+                </Disclosure.Button>
+                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="demiseDateTime">
+                      תאריך ושעת פטירה
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="demiseDateTime"
+                      type="datetime-local"
+                      placeholder=""
+                      name="demiseDateTime"
+                      value={formData.demiseDateTime}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="externalTestDateTime">
+                      תאריך ושעת בדיקה חיצונית
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="externalTestDateTime"
+                      type="datetime-local"
+                      placeholder=""
+                      name="externalTestDateTime"
+                      value={formData.externalTestDateTime}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTDateTime">
+                      תאריך ושעת בדיקת PM-CT
+                    </label>
+                    <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="PMCTDateTime"
+                      type="datetime-local"
+                      placeholder=""
+                      name="PMCTDateTime"
+                      value={formData.PMCTDateTime}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-1">
+                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTInterpretation">
+                      פענוח PM-CT
+                    </label>
+                    <textarea
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="PMCTInterpretation"
+                      placeholder=""
+                      name="PMCTInterpretation"
+                      value={formData.PMCTInterpretation}
+                      onChange={handleChange}
+                      rows={5}
+                    />
+                  </div>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+
+          {/* אמצעי מיגון Section */}
+          <Disclosure defaultOpen>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-green-100 px-4 py-2 text-left text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring focus-visible:ring-green-500 focus-visible:ring-opacity-75 mt-2">
+                  <span className="text-xl font-bold">אמצעי מיגון</span>
+                  <ChevronUpIcon
+                    className={`${
+                      open ? 'rotate-180 transform' : ''
+                    } h-5 w-5 text-green-500`}
+                  />
+                </Disclosure.Button>
+                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                  <div className="flex flex-col gap-1 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    {protectionMeans.map((item) => (
+                      <label key={item} className="flex items-center mb-1">
+                        <input
+                          type="checkbox"
+                          value={item}
+                          checked={formData.protectionMeans.includes(item)}
+                          onChange={handleProtectionMeansCheckbox}
+                          className="form-checkbox h-4 w-4 text-blue-600 ml-1"
+                        />
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
 
         </div>
       )}
