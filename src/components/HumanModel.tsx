@@ -1,5 +1,5 @@
 import { Suspense, useEffect } from 'react';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { ThreeEvent, useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
@@ -127,6 +127,60 @@ const HumanModel: React.FC<HumanModelProps> = ({
     );
   };
 
+  const renderOrientationLabels = () => {
+    return (
+      <>
+        {/* Left side label and arrow */}
+        <group position={[-14, 25, 0]}>
+          <Billboard>
+            <Text
+              position={[0, 2, 0]}
+              fontSize={2}
+              color="black"
+              anchorX="center"
+              anchorY="middle"
+            >
+              R
+            </Text>
+          </Billboard>
+          {/* Left pointing arrow */}
+          <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <coneGeometry args={[0.5, 2]} />
+            <meshBasicMaterial color="blue" />
+          </mesh>
+          <mesh position={[-1, 0, 0]}>
+            <cylinderGeometry args={[0.1, 0.1, 2]} />
+            <meshBasicMaterial color="blue" />
+          </mesh>
+        </group>
+
+        {/* Right side label and arrow */}
+        <group position={[14, 25, 0]}>
+          <Billboard>
+            <Text
+              position={[0, 2, 0]}
+              fontSize={2}
+              color="black"
+              anchorX="center"
+              anchorY="middle"
+            >
+              L
+            </Text>
+          </Billboard>
+          {/* Right pointing arrow */}
+          <mesh position={[0, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+            <coneGeometry args={[0.5, 2]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+          <mesh position={[1, 0, 0]}>
+            <cylinderGeometry args={[0.1, 0.1, 2]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+        </group>
+      </>
+    );
+  };
+
 
   // Only call onClick if not a drag
   const handlePointerDown = (e: any) => {
@@ -167,6 +221,7 @@ const HumanModel: React.FC<HumanModelProps> = ({
         {renderMarkers()}
         {renderPolygonLines()}
         {renderPolygonFill()}
+        {renderOrientationLabels()}
       </Suspense>
     </>
   );
