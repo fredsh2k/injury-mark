@@ -43,22 +43,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
     loadFilterState('analysis_selectedInjuryLocations', selectedLocations)
   );
 
-  // Filter submissions based on selected criteria
-  const filteredSubmissions = submissions.filter(submission => {
-    // Filter by protection means
-    const hasMatchingProtection = selectedProtectionMeans.length === 0 || 
-      submission.protectionMeans.some(pm => selectedProtectionMeans.includes(pm));
-    
-    // Filter by injury types and locations
-    const hasMatchingInjuries = submission.injuries.some(injury => {
-      const typeMatch = selectedInjuryTypes.includes(injury.type);
-      const locationMatch = selectedInjuryLocations.includes(injury.selectedLocation);
-      return typeMatch && locationMatch;
-    });
-
-    return hasMatchingProtection && hasMatchingInjuries;
-  });
-
+  // Get all injuries and calculate totals
   const injuries = submissions.map(submission => submission.injuries)
   const totalInjuries = injuries.flat().length
   
