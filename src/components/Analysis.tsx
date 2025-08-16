@@ -49,13 +49,15 @@ const Analysis = ({ submissions }: AnalysisProps) => {
   
   // Filter injuries based on selected criteria AND protection means
   const filteredInjuries = submissions.filter(submission => {
-    // Filter by protection means
+    // Filter by protection means - handle undefined/null protectionMeans
+    const protectionMeans = submission.protectionMeans || [];
+    
     if (selectedProtectionMeans.length === 0) {
       // When no protection means are selected, show only submissions with no protection
-      return submission.protectionMeans.length === 0;
+      return protectionMeans.length === 0;
     } else {
       // When protection means are selected, show submissions that have at least one matching protection
-      return submission.protectionMeans.some(pm => selectedProtectionMeans.includes(pm));
+      return protectionMeans.some(pm => selectedProtectionMeans.includes(pm));
     }
   }).map(submission => submission.injuries).flat().filter(injury => {
     // Then filter by injury type and location
@@ -152,9 +154,10 @@ const Analysis = ({ submissions }: AnalysisProps) => {
   };
 
   const countSubmissionsByProtection = (protection: string): number => {
-    return submissions.filter(submission => 
-      submission.protectionMeans.includes(protection)
-    ).reduce((count, submission) => count + submission.injuries.length, 0);
+    return submissions.filter(submission => {
+      const protectionMeans = submission.protectionMeans || [];
+      return protectionMeans.includes(protection);
+    }).reduce((count, submission) => count + submission.injuries.length, 0);
   };
 
   const countInjuriesByLocation = (location: string): number => {
