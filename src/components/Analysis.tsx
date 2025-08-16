@@ -3,6 +3,7 @@ import HumanModel from "./HumanModel"
 import { Suspense, useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 import { Marker, Submission } from '../Interfaces';
+import { selectedLocations, injuryTypes, protectionMeans } from '../Constants';
 import chroma from 'chroma-js';
 
 
@@ -11,12 +12,169 @@ interface AnalysisProps {
 }
 
 const Analysis = ({ submissions }: AnalysisProps) => {
+  // Helper function to load saved filter state from localStorage
+  const loadFilterState = (key: string, defaultValue: string[]): string[] => {
+    try {
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Helper function to load proximity threshold from localStorage
+  const loadProximityThreshold = (): number => {
+    try {
+      const saved = localStorage.getItem('analysis_proximityThreshold');
+      return saved ? parseFloat(saved) : 0.15;
+    } catch {
+      return 0.15;
+    }
+  };
+
+  // Filter states - load from localStorage or default to all selected
+  const [selectedInjuryTypes, setSelectedInjuryTypes] = useState<string[]>(() => 
+    loadFilterState('analysis_selectedInjuryTypes', injuryTypes)
+  );
+  const [selectedProtectionMeans, setSelectedProtectionMeans] = useState<string[]>(() => 
+    loadFilterState('analysis_selectedProtectionMeans', protectionMeans)
+  );
+  const [selectedInjuryLocations, setSelectedInjuryLocations] = useState<string[]>(() => 
+    loadFilterState('analysis_selectedInjuryLocations', selectedLocations)
+  );
+
+  // Filter submissions based on selected criteria
+  const filteredSubmissions = submissions.filter(submission => {
+    // Filter by protection means
+    const hasMatchingProtection = selectedProtectionMeans.length === 0 || 
+      submission.protectionMeans.some(pm => selectedProtectionMeans.includes(pm));
+    
+    // Filter by injury types and locations
+    const hasMatchingInjuries = submission.injuries.some(injury => {
+      const typeMatch = selectedInjuryTypes.includes(injury.type);
+      const locationMatch = selectedInjuryLocations.includes(injury.selectedLocation);
+      return typeMatch && locationMatch;
+    });
+
+    return hasMatchingProtection && hasMatchingInjuries;
+  });
 
   const injuries = submissions.map(submission => submission.injuries)
-  const allMarkers: Marker[] = injuries.flat().map(injury => ({ location: new THREE.Vector3(injury.location.x, injury.location.y, injury.location.z) }))
+  const totalInjuries = injuries.flat().length
+  
+  // Filter injuries based on selected criteria AND protection means
+  const filteredInjuries = submissions.filter(submission => {
+    // Filter by protection means
+    if (selectedProtectionMeans.length === 0) {
+      // When no protection means are selected, show only submissions with no protection
+      return submission.protectionMeans.length === 0;
+    } else {
+      // When protection means are selected, show submissions that have at least one matching protection
+      return submission.protectionMeans.some(pm => selectedProtectionMeans.includes(pm));
+    }
+  }).map(submission => submission.injuries).flat().filter(injury => {
+    // Then filter by injury type and location
+    const typeMatch = selectedInjuryTypes.includes(injury.type);
+    const locationMatch = selectedInjuryLocations.includes(injury.selectedLocation);
+    return typeMatch && locationMatch;
+  });
+
+  const allMarkers: Marker[] = filteredInjuries.map(injury => ({ location: new THREE.Vector3(injury.location.x, injury.location.y, injury.location.z) }))
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const modelRef = useRef<THREE.Group>(null);
-  const [proximityThreshold, setProximityThreshold] = useState(0.15);
+  const [proximityThreshold, setProximityThreshold] = useState<number>(() => 
+    loadProximityThreshold()
+  );
+
+  // Save filter states to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('analysis_selectedInjuryTypes', JSON.stringify(selectedInjuryTypes));
+  }, [selectedInjuryTypes]);
+
+  useEffect(() => {
+    localStorage.setItem('analysis_selectedProtectionMeans', JSON.stringify(selectedProtectionMeans));
+  }, [selectedProtectionMeans]);
+
+  useEffect(() => {
+    localStorage.setItem('analysis_selectedInjuryLocations', JSON.stringify(selectedInjuryLocations));
+  }, [selectedInjuryLocations]);
+
+  useEffect(() => {
+    localStorage.setItem('analysis_proximityThreshold', proximityThreshold.toString());
+  }, [proximityThreshold]);
+
+  // Helper functions for filter changes
+  const handleInjuryTypeChange = (type: string, checked: boolean) => {
+    if (checked) {
+      setSelectedInjuryTypes(prev => [...prev, type]);
+    } else {
+      setSelectedInjuryTypes(prev => prev.filter(t => t !== type));
+    }
+  };
+
+  const handleProtectionMeansChange = (protection: string, checked: boolean) => {
+    if (checked) {
+      setSelectedProtectionMeans(prev => [...prev, protection]);
+    } else {
+      setSelectedProtectionMeans(prev => prev.filter(p => p !== protection));
+    }
+  };
+
+  const handleLocationChange = (location: string, checked: boolean) => {
+    if (checked) {
+      setSelectedInjuryLocations(prev => [...prev, location]);
+    } else {
+      setSelectedInjuryLocations(prev => prev.filter(l => l !== location));
+    }
+  };
+
+  // Helper functions to toggle all selections
+  const toggleAllInjuryTypes = () => {
+    if (selectedInjuryTypes.length === injuryTypes.length) {
+      setSelectedInjuryTypes([]);
+    } else {
+      setSelectedInjuryTypes(injuryTypes);
+    }
+  };
+
+  const toggleAllProtectionMeans = () => {
+    if (selectedProtectionMeans.length === protectionMeans.length) {
+      setSelectedProtectionMeans([]);
+    } else {
+      setSelectedProtectionMeans(protectionMeans);
+    }
+  };
+
+  const toggleAllLocations = () => {
+    if (selectedInjuryLocations.length === selectedLocations.length) {
+      setSelectedInjuryLocations([]);
+    } else {
+      setSelectedInjuryLocations(selectedLocations);
+    }
+  };
+
+  // Reset all filters to default values
+  const resetAllFilters = () => {
+    setSelectedInjuryTypes(injuryTypes);
+    setSelectedProtectionMeans(protectionMeans);
+    setSelectedInjuryLocations(selectedLocations);
+    setProximityThreshold(0.15);
+  };
+
+  // Helper functions to count injuries for each filter option
+  const countInjuriesByType = (type: string): number => {
+    return injuries.flat().filter(injury => injury.type === type).length;
+  };
+
+  const countSubmissionsByProtection = (protection: string): number => {
+    return submissions.filter(submission => 
+      submission.protectionMeans.includes(protection)
+    ).reduce((count, submission) => count + submission.injuries.length, 0);
+  };
+
+  const countInjuriesByLocation = (location: string): number => {
+    return injuries.flat().filter(injury => injury.selectedLocation === location).length;
+  };
 
 
   useEffect(() => {
@@ -136,45 +294,150 @@ const Analysis = ({ submissions }: AnalysisProps) => {
 
 
   return (
-    <div style={{ height: "93vh" }}>
+    <div className="h-screen flex">
+      {/* Filters Panel */}
+      <div className="w-1/6 bg-gray-100 p-2 overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-sm font-bold">מסננים</h2>
+          <button
+            onClick={resetAllFilters}
+            className="text-xs bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600"
+            title="איפוס כל המסננים"
+          >
+            איפוס
+          </button>
+        </div>
+        
+        {/* Proximity Threshold Filter */}
+        <div className="mb-6">
+          <label htmlFor="proximityThreshold" className="block text-gray-700 text-sm font-bold mb-2">
+            סף קרבה לפציעה: {proximityThreshold.toFixed(2)}
+          </label>
+          <input
+            type="range"
+            id="proximityThreshold"
+            name="proximityThreshold"
+            min="0"
+            max="0.5"
+            step="0.01"
+            value={proximityThreshold}
+            onChange={(e) => setProximityThreshold(parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
 
-      <div className="w-1/4 shadow-md m-2 p-2 rounded-lg">
-        <label htmlFor="proximityThreshold" className="block text-gray-700 text-sm font-bold m-1">
-          סף קרבה לפציעה: {proximityThreshold.toFixed(2)}
-        </label>
-        <input
-          type="range"
-          id="proximityThreshold"
-          name="proximityThreshold"
-          min="0"
-          max="0.5"
-          step="0.01"
-          value={proximityThreshold}
-          onChange={(e) => setProximityThreshold(parseFloat(e.target.value))}
-          className="w-full"
-        />
+        {/* Injury Types Filter */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-md font-semibold">סוגי פציעות</h3>
+            <button
+              onClick={toggleAllInjuryTypes}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              {selectedInjuryTypes.length === injuryTypes.length ? 'בטל הכל' : 'בחר הכל'}
+            </button>
+          </div>
+          <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+            {injuryTypes.map((type) => (
+              <label key={type} className="flex items-center mb-1 text-xs">
+                <input
+                  type="checkbox"
+                  checked={selectedInjuryTypes.includes(type)}
+                  onChange={(e) => handleInjuryTypeChange(type, e.target.checked)}
+                  className="mr-2 ml-1"
+                />
+                <span className="flex-1">
+                  {type} ({countInjuriesByType(type)})
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Protection Means Filter */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-md font-semibold">אמצעי הגנה</h3>
+            <button
+              onClick={toggleAllProtectionMeans}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              {selectedProtectionMeans.length === protectionMeans.length ? 'בטל הכל' : 'בחר הכל'}
+            </button>
+          </div>
+          <div className="max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+            {protectionMeans.map((protection) => (
+              <label key={protection} className="flex items-center mb-1 text-sm">
+                <input
+                  type="checkbox"
+                  checked={selectedProtectionMeans.includes(protection)}
+                  onChange={(e) => handleProtectionMeansChange(protection, e.target.checked)}
+                  className="mr-2 ml-1"
+                />
+                <span className="flex-1">
+                  {protection} ({countSubmissionsByProtection(protection)})
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Injury Locations Filter */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-md font-semibold">מיקומי פציעות</h3>
+            <button
+              onClick={toggleAllLocations}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              {selectedInjuryLocations.length === selectedLocations.length ? 'בטל הכל' : 'בחר הכל'}
+            </button>
+          </div>
+          <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+            {selectedLocations.map((location) => (
+              <label key={location} className="flex items-center mb-1 text-xs">
+                <input
+                  type="checkbox"
+                  checked={selectedInjuryLocations.includes(location)}
+                  onChange={(e) => handleLocationChange(location, e.target.checked)}
+                  className="mr-2 ml-1"
+                />
+                <span className="flex-1">
+                  {location} ({countInjuriesByLocation(location)})
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Filter Summary */}
+        <div className="text-xs text-gray-600 border-t pt-2">
+          <div>פציעות מוצגות: {allMarkers.length} מתוך {totalInjuries}</div>
+        </div>
       </div>
 
-      <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.5} />
-          <spotLight position={[0, 50, 50]} decay={0} intensity={1} />
-          <spotLight position={[0, 50, -50]} decay={0} intensity={1} />
-          <pointLight position={[0, 100, 50]} decay={0} intensity={1} />
-          <pointLight position={[0, 100, -50]} decay={0} intensity={1} />
+      {/* 3D Model Display */}
+      <div className="w-5/6">
+        <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.5} />
+            <spotLight position={[0, 50, 50]} decay={0} intensity={1} />
+            <spotLight position={[0, 50, -50]} decay={0} intensity={1} />
+            <pointLight position={[0, 100, 50]} decay={0} intensity={1} />
+            <pointLight position={[0, 100, -50]} decay={0} intensity={1} />
 
-          <HumanModel modelRef={modelRef} onLoad={() => setIsModelLoaded(true)} markers={[]} onClick={() => console.log('click')}></HumanModel>
+            <HumanModel modelRef={modelRef} onLoad={() => setIsModelLoaded(true)} markers={[]} onClick={() => console.log('click')}></HumanModel>
 
-          {isModelLoaded &&
-            allMarkers.map((marker, index) => (
-              <mesh key={index} position={marker.location}>
-                <sphereGeometry args={[0.15]} />
-                <meshStandardMaterial color='red' />
-              </mesh>
-            ))}
-        </Suspense>
-      </Canvas>
-
+            {isModelLoaded &&
+              allMarkers.map((marker, index) => (
+                <mesh key={index} position={marker.location}>
+                  <sphereGeometry args={[0.15]} />
+                  <meshStandardMaterial color='red' />
+                </mesh>
+              ))}
+          </Suspense>
+        </Canvas>
+      </div>
     </div>
   )
 }
