@@ -75,6 +75,128 @@ const Analysis = ({ submissions }: AnalysisProps) => {
     loadProximityThreshold()
   );
 
+  // Defensive plate types and state
+  type PlateType = 'hard' | 'long' | 'short' | 'soft' | null;
+  const [selectedPlate, setSelectedPlate] = useState<PlateType>(null);
+
+  // Define plate shapes - each plate is a 3D solid with 8 vertices (4 front + 4 back)
+  interface PlateShape {
+    front: THREE.Vector3[]; // 8 vertices defining the front plate
+    back: THREE.Vector3[];  // 8 vertices defining the back plate
+  }
+
+  const plateShapes: Record<Exclude<PlateType, null>, PlateShape> = {
+    hard: {
+      // Front plate - rectangular solid
+      front: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.25, 0.5, 0.9),   // top left front face
+        new THREE.Vector3(0.25, 0.5, 0.9),    // top right front face
+        new THREE.Vector3(0.25, 0.0, 0.9),    // bottom right front face
+        new THREE.Vector3(-0.25, 0.0, 0.9),   // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.25, 0.5, 0.7),   // top left back face
+        new THREE.Vector3(0.25, 0.5, 0.7),    // top right back face
+        new THREE.Vector3(0.25, 0.0, 0.7),    // bottom right back face
+        new THREE.Vector3(-0.25, 0.0, 0.7),   // bottom left back face
+      ],
+      // Back plate - rectangular solid
+      back: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.25, 0.5, -0.9),   // top left front face
+        new THREE.Vector3(0.25, 0.5, -0.9),    // top right front face
+        new THREE.Vector3(0.25, 0.0, -0.9),    // bottom right front face
+        new THREE.Vector3(-0.25, 0.0, -0.9),   // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.25, 0.5, -1.1),   // top left back face
+        new THREE.Vector3(0.25, 0.5, -1.1),    // top right back face
+        new THREE.Vector3(0.25, 0.0, -1.1),    // bottom right back face
+        new THREE.Vector3(-0.25, 0.0, -1.1),   // bottom left back face
+      ],
+    },
+    long: {
+      // Long plate - extended chest to abdomen coverage
+      front: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.36, 0.7, 0.9),   // top left front face
+        new THREE.Vector3(0.36, 0.7, 0.9),    // top right front face
+        new THREE.Vector3(0.36, -0.3, 0.9),   // bottom right front face
+        new THREE.Vector3(-0.36, -0.3, 0.9),  // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.36, 0.7, 0.7),   // top left back face
+        new THREE.Vector3(0.36, 0.7, 0.7),    // top right back face
+        new THREE.Vector3(0.36, -0.3, 0.7),   // bottom right back face
+        new THREE.Vector3(-0.36, -0.3, 0.7),  // bottom left back face
+      ],
+      back: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.34, 0.68, -0.9),   // top left front face
+        new THREE.Vector3(0.34, 0.68, -0.9),    // top right front face
+        new THREE.Vector3(0.34, -0.28, -0.9),   // bottom right front face
+        new THREE.Vector3(-0.34, -0.28, -0.9),  // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.34, 0.68, -1.1),   // top left back face
+        new THREE.Vector3(0.34, 0.68, -1.1),    // top right back face
+        new THREE.Vector3(0.34, -0.28, -1.1),   // bottom right back face
+        new THREE.Vector3(-0.34, -0.28, -1.1),  // bottom left back face
+      ],
+    },
+    short: {
+      // Short plate - minimal chest coverage
+      front: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.24, 0.5, 0.9),   // top left front face
+        new THREE.Vector3(0.24, 0.5, 0.9),    // top right front face
+        new THREE.Vector3(0.24, 0.2, 0.9),    // bottom right front face
+        new THREE.Vector3(-0.24, 0.2, 0.9),   // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.24, 0.5, 0.7),   // top left back face
+        new THREE.Vector3(0.24, 0.5, 0.7),    // top right back face
+        new THREE.Vector3(0.24, 0.2, 0.7),    // bottom right back face
+        new THREE.Vector3(-0.24, 0.2, 0.7),   // bottom left back face
+      ],
+      back: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.22, 0.48, -0.9),   // top left front face
+        new THREE.Vector3(0.22, 0.48, -0.9),    // top right front face
+        new THREE.Vector3(0.22, 0.22, -0.9),    // bottom right front face
+        new THREE.Vector3(-0.22, 0.22, -0.9),   // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.22, 0.48, -1.1),   // top left back face
+        new THREE.Vector3(0.22, 0.48, -1.1),    // top right back face
+        new THREE.Vector3(0.22, 0.22, -1.1),    // bottom right back face
+        new THREE.Vector3(-0.22, 0.22, -1.1),   // bottom left back face
+      ],
+    },
+    soft: {
+      // Soft armor - wider coverage including sides
+      front: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.44, 0.76, 0.9),   // top left front face
+        new THREE.Vector3(0.44, 0.76, 0.9),    // top right front face
+        new THREE.Vector3(0.44, -0.1, 0.9),    // bottom right front face
+        new THREE.Vector3(-0.44, -0.1, 0.9),   // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.44, 0.76, 0.7),   // top left back face
+        new THREE.Vector3(0.44, 0.76, 0.7),    // top right back face
+        new THREE.Vector3(0.44, -0.1, 0.7),    // bottom right back face
+        new THREE.Vector3(-0.44, -0.1, 0.7),   // bottom left back face
+      ],
+      back: [
+        // Front face (4 vertices)
+        new THREE.Vector3(-0.42, 0.74, -0.9),   // top left front face
+        new THREE.Vector3(0.42, 0.74, -0.9),    // top right front face
+        new THREE.Vector3(0.42, -0.08, -0.9),   // bottom right front face
+        new THREE.Vector3(-0.42, -0.08, -0.9),  // bottom left front face
+        // Back face (4 vertices)
+        new THREE.Vector3(-0.42, 0.74, -1.1),   // top left back face
+        new THREE.Vector3(0.42, 0.74, -1.1),    // top right back face
+        new THREE.Vector3(0.42, -0.08, -1.1),   // bottom right back face
+        new THREE.Vector3(-0.42, -0.08, -1.1),  // bottom left back face
+      ],
+    },
+  };
+
   // Save filter states to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('analysis_selectedInjuryTypes', JSON.stringify(selectedInjuryTypes));
@@ -409,26 +531,225 @@ const Analysis = ({ submissions }: AnalysisProps) => {
       </div>
 
       {/* 3D Model Display */}
-      <div className="w-5/6">
-        <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.5} />
-            <spotLight position={[0, 50, 50]} decay={0} intensity={1} />
-            <spotLight position={[0, 50, -50]} decay={0} intensity={1} />
-            <pointLight position={[0, 100, 50]} decay={0} intensity={1} />
-            <pointLight position={[0, 100, -50]} decay={0} intensity={1} />
+      <div className="w-5/6 flex flex-col">
+        {/* Plate Selection Buttons */}
+        <div className="p-4 bg-gray-100 border-b flex gap-2">
+          <button
+            onClick={() => setSelectedPlate(selectedPlate === 'hard' ? null : 'hard')}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              selectedPlate === 'hard'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+            }`}
+          >
+            לוח קשיח
+          </button>
+          <button
+            onClick={() => setSelectedPlate(selectedPlate === 'long' ? null : 'long')}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              selectedPlate === 'long'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+            }`}
+          >
+            לוח ארוך
+          </button>
+          <button
+            onClick={() => setSelectedPlate(selectedPlate === 'short' ? null : 'short')}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              selectedPlate === 'short'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+            }`}
+          >
+            לוח קצר
+          </button>
+          <button
+            onClick={() => setSelectedPlate(selectedPlate === 'soft' ? null : 'soft')}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              selectedPlate === 'soft'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+            }`}
+          >
+            שכפ"צ
+          </button>
+          {selectedPlate && (
+            <button
+              onClick={() => setSelectedPlate(null)}
+              className="px-4 py-2 rounded font-semibold bg-red-500 text-white hover:bg-red-600"
+            >
+              נקה לוח
+            </button>
+          )}
+        </div>
 
-            <HumanModel modelRef={modelRef} onLoad={() => setIsModelLoaded(true)} markers={[]} onClick={() => console.log('click')}></HumanModel>
+        {/* Canvas */}
+        <div className="flex-1">
+          <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
+            <Suspense fallback={null}>
+              <ambientLight intensity={0.5} />
+              <spotLight position={[0, 50, 50]} decay={0} intensity={1} />
+              <spotLight position={[0, 50, -50]} decay={0} intensity={1} />
+              <pointLight position={[0, 100, 50]} decay={0} intensity={1} />
+              <pointLight position={[0, 100, -50]} decay={0} intensity={1} />
 
-            {isModelLoaded &&
-              allMarkers.map((marker, index) => (
-                <mesh key={index} position={marker.location}>
-                  <sphereGeometry args={[0.15]} />
-                  <meshStandardMaterial color='red' />
-                </mesh>
-              ))}
-          </Suspense>
-        </Canvas>
+              <HumanModel modelRef={modelRef} onLoad={() => setIsModelLoaded(true)} markers={[]} onClick={() => console.log('click')}></HumanModel>
+
+              {isModelLoaded &&
+                allMarkers.map((marker, index) => (
+                  <mesh key={index} position={marker.location}>
+                    <sphereGeometry args={[0.15]} />
+                    <meshStandardMaterial color='red' />
+                  </mesh>
+                ))}
+
+              {/* Render defensive plates if selected */}
+              {isModelLoaded && selectedPlate && modelRef.current && (() => {
+                const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
+                const { min, max } = boundingBox;
+                
+                const plateShape = plateShapes[selectedPlate];
+                
+                // Denormalize vertices to world coordinates
+                const denormalize = (v: THREE.Vector3) => {
+                  const worldX = (v.x + 1) / 2 * (max.x - min.x) + min.x;
+                  const worldY = (v.y + 1) / 2 * (max.y - min.y) + min.y;
+                  const worldZ = (v.z + 1) / 2 * (max.z - min.z) + min.z;
+                  return new THREE.Vector3(worldX, worldY, worldZ);
+                };
+
+                const frontPlateVertices = plateShape.front.map(denormalize);
+                const backPlateVertices = plateShape.back.map(denormalize);
+
+                // Create a 3D solid plate from 8 vertices (4 front face + 4 back face)
+                const createPlateGeometry = (vertices: THREE.Vector3[]) => {
+                  const positions: number[] = [];
+                  
+                  // Front face (vertices 0-3)
+                  positions.push(
+                    vertices[0].x, vertices[0].y, vertices[0].z,
+                    vertices[1].x, vertices[1].y, vertices[1].z,
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    vertices[3].x, vertices[3].y, vertices[3].z,
+                    vertices[0].x, vertices[0].y, vertices[0].z,
+                  );
+                  
+                  // Back face (vertices 4-7)
+                  positions.push(
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                    vertices[6].x, vertices[6].y, vertices[6].z,
+                    vertices[5].x, vertices[5].y, vertices[5].z,
+                    
+                    vertices[6].x, vertices[6].y, vertices[6].z,
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                    vertices[7].x, vertices[7].y, vertices[7].z,
+                  );
+                  
+                  // Top face (0-1 front, 4-5 back)
+                  positions.push(
+                    vertices[0].x, vertices[0].y, vertices[0].z,
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                    vertices[1].x, vertices[1].y, vertices[1].z,
+                    
+                    vertices[1].x, vertices[1].y, vertices[1].z,
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                    vertices[5].x, vertices[5].y, vertices[5].z,
+                  );
+                  
+                  // Bottom face (2-3 front, 6-7 back)
+                  positions.push(
+                    vertices[3].x, vertices[3].y, vertices[3].z,
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    vertices[7].x, vertices[7].y, vertices[7].z,
+                    
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    vertices[6].x, vertices[6].y, vertices[6].z,
+                    vertices[7].x, vertices[7].y, vertices[7].z,
+                  );
+                  
+                  // Left face (0-3 front, 4-7 back)
+                  positions.push(
+                    vertices[0].x, vertices[0].y, vertices[0].z,
+                    vertices[3].x, vertices[3].y, vertices[3].z,
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                    
+                    vertices[3].x, vertices[3].y, vertices[3].z,
+                    vertices[7].x, vertices[7].y, vertices[7].z,
+                    vertices[4].x, vertices[4].y, vertices[4].z,
+                  );
+                  
+                  // Right face (1-2 front, 5-6 back)
+                  positions.push(
+                    vertices[1].x, vertices[1].y, vertices[1].z,
+                    vertices[5].x, vertices[5].y, vertices[5].z,
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    
+                    vertices[2].x, vertices[2].y, vertices[2].z,
+                    vertices[5].x, vertices[5].y, vertices[5].z,
+                    vertices[6].x, vertices[6].y, vertices[6].z,
+                  );
+                  
+                  const geometry = new THREE.BufferGeometry();
+                  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+                  geometry.computeVertexNormals();
+                  return geometry;
+                };
+
+                const frontPlateGeometry = createPlateGeometry(frontPlateVertices);
+                const backPlateGeometry = createPlateGeometry(backPlateVertices);
+
+                return (
+                  <group>
+                    {/* Front plate */}
+                    <mesh geometry={frontPlateGeometry} renderOrder={999}>
+                      <meshStandardMaterial 
+                        color="#4A5568"
+                        transparent={true}
+                        opacity={0.8}
+                        side={THREE.DoubleSide}
+                        depthTest={true}
+                        metalness={0.8}
+                        roughness={0.3}
+                      />
+                    </mesh>
+
+                    {/* Back plate */}
+                    <mesh geometry={backPlateGeometry} renderOrder={999}>
+                      <meshStandardMaterial 
+                        color="#6B7280"
+                        transparent={true}
+                        opacity={0.8}
+                        side={THREE.DoubleSide}
+                        depthTest={true}
+                        metalness={0.8}
+                        roughness={0.3}
+                      />
+                    </mesh>
+
+                    {/* Vertex markers for front plate */}
+                    {frontPlateVertices.map((vertex, index) => (
+                      <mesh key={`front-plate-marker-${index}`} position={vertex}>
+                        <sphereGeometry args={[0.1]} />
+                        <meshStandardMaterial color="#DC2626" />
+                      </mesh>
+                    ))}
+
+                    {/* Vertex markers for back plate */}
+                    {backPlateVertices.map((vertex, index) => (
+                      <mesh key={`back-plate-marker-${index}`} position={vertex}>
+                        <sphereGeometry args={[0.1]} />
+                        <meshStandardMaterial color="#2563EB" />
+                      </mesh>
+                    ))}
+                  </group>
+                );
+              })()}
+            </Suspense>
+          </Canvas>
+        </div>
       </div>
     </div>
   )
