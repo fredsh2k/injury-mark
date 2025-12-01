@@ -127,6 +127,67 @@ const HumanModel: React.FC<HumanModelProps> = ({
     );
   };
 
+  const renderAxisHelper = () => {
+    const axisLength = 5;
+    const axisRadius = 0.1;
+    const arrowSize = 0.5;
+
+    return (
+      <group position={[-2, -35, 0]}>
+        {/* X Axis - Red */}
+        <group>
+          <mesh position={[axisLength / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[axisRadius, axisRadius, axisLength]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+          <mesh position={[axisLength, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+            <coneGeometry args={[arrowSize, arrowSize * 2]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+          <Billboard position={[axisLength + 1.5, 0, 0]}>
+            <Text fontSize={1.5} color="red" anchorX="center" anchorY="middle">
+              X
+            </Text>
+          </Billboard>
+        </group>
+
+        {/* Y Axis - Green */}
+        <group>
+          <mesh position={[0, axisLength / 2, 0]}>
+            <cylinderGeometry args={[axisRadius, axisRadius, axisLength]} />
+            <meshBasicMaterial color="green" />
+          </mesh>
+          <mesh position={[0, axisLength, 0]}>
+            <coneGeometry args={[arrowSize, arrowSize * 2]} />
+            <meshBasicMaterial color="green" />
+          </mesh>
+          <Billboard position={[0, axisLength + 1.5, 0]}>
+            <Text fontSize={1.5} color="green" anchorX="center" anchorY="middle">
+              Y
+            </Text>
+          </Billboard>
+        </group>
+
+        {/* Z Axis - Blue */}
+        <group>
+          <mesh position={[0, 0, axisLength / 2]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[axisRadius, axisRadius, axisLength]} />
+            <meshBasicMaterial color="blue" />
+          </mesh>
+          <mesh position={[0, 0, axisLength]} rotation={[Math.PI / 2, 0, 0]}>
+            <coneGeometry args={[arrowSize, arrowSize * 2]} />
+            <meshBasicMaterial color="blue" />
+          </mesh>
+          <Billboard position={[0, 0, axisLength + 1.5]}>
+            <Text fontSize={1.5} color="blue" anchorX="center" anchorY="middle">
+              Z
+            </Text>
+          </Billboard>
+        </group>
+      </group>
+    );
+  };
+
   const renderOrientationLabels = () => {
     return (
       <>
@@ -222,6 +283,7 @@ const HumanModel: React.FC<HumanModelProps> = ({
         {renderPolygonLines()}
         {renderPolygonFill()}
         {renderOrientationLabels()}
+        {renderAxisHelper()}
       </Suspense>
     </>
   );
