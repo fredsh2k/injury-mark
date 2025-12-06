@@ -79,121 +79,137 @@ const Analysis = ({ submissions }: AnalysisProps) => {
   type PlateType = 'hard' | 'long' | 'short' | 'soft' | null;
   const [selectedPlate, setSelectedPlate] = useState<PlateType>(null);
 
-  // Define plate shapes - each plate is a 3D solid with 8 vertices (4 front + 4 back)
+  // Plate center Y position controls
+  const [hardCenterYFront, setHardCenterYFront] = useState(0.08);
+  const [hardCenterYBack, setHardCenterYBack] = useState(0.10);
+  const [longCenterYFront, setLongCenterYFront] = useState(0.46);
+  const [longCenterYBack, setLongCenterYBack] = useState(0.48);
+  const [shortCenterYFront, setShortCenterYFront] = useState(0.46);
+  const [shortCenterYBack, setShortCenterYBack] = useState(0.48);
+  const [softCenterYFront, setSoftCenterYFront] = useState(0.14);
+  const [softCenterYBack, setSoftCenterYBack] = useState(0.14);
+
+  // Define plate shapes - 2D shape with depth and positioning
   interface PlateShape {
-    front: THREE.Vector3[]; // 8 vertices defining the front plate
-    back: THREE.Vector3[];  // 8 vertices defining the back plate
+    shape?: { x: number; y: number }[]; // 2D shape (x, y coordinates) - used when front/back are same
+    shapeFront?: { x: number; y: number }[]; // Front plate shape (if different from back)
+    shapeBack?: { x: number; y: number }[];  // Back plate shape (if different from front)
+    depth: number;        // Thickness of each plate
+    zFront: number;       // Z position for front plate
+    zBack: number;        // Z position for back plate
+    centerYFront: number; // Y offset for front plate center
+    centerYBack: number;  // Y offset for back plate center
   }
 
   const plateShapes: Record<Exclude<PlateType, null>, PlateShape> = {
     hard: {
-      // Front plate - rectangular solid
-      front: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.25, 0.5, 0.9),   // top left front face
-        new THREE.Vector3(0.25, 0.5, 0.9),    // top right front face
-        new THREE.Vector3(0.25, 0.0, 0.9),    // bottom right front face
-        new THREE.Vector3(-0.25, 0.0, 0.9),   // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.25, 0.5, 0.7),   // top left back face
-        new THREE.Vector3(0.25, 0.5, 0.7),    // top right back face
-        new THREE.Vector3(0.25, 0.0, 0.7),    // bottom right back face
-        new THREE.Vector3(-0.25, 0.0, 0.7),   // bottom left back face
+      // Hexagonal shape (shooter's cut armor plate)
+      // Exact dimensions: bottom 260mm wide, top 195mm wide, height 337mm
+      shape: [
+        { x: -0.2164, y: 0.55 },    // top left (97.5mm from center)
+        { x: 0.2164, y: 0.55 },     // top right (97.5mm from center)
+        { x: 0.2886, y: 0.50 },     // right shoulder (130mm from center)
+        { x: 0.2886, y: 0.1670 },   // bottom right (130mm from center, 337mm down)
+        { x: -0.2886, y: 0.1670 },  // bottom left
+        { x: -0.2886, y: 0.50 },    // left shoulder
       ],
-      // Back plate - rectangular solid
-      back: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.25, 0.5, -0.9),   // top left front face
-        new THREE.Vector3(0.25, 0.5, -0.9),    // top right front face
-        new THREE.Vector3(0.25, 0.0, -0.9),    // bottom right front face
-        new THREE.Vector3(-0.25, 0.0, -0.9),   // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.25, 0.5, -1.1),   // top left back face
-        new THREE.Vector3(0.25, 0.5, -1.1),    // top right back face
-        new THREE.Vector3(0.25, 0.0, -1.1),    // bottom right back face
-        new THREE.Vector3(-0.25, 0.0, -1.1),   // bottom left back face
-      ],
+      depth: 0.1,     // 10cm thick plate
+      zFront: 0.88,    // Position in front
+      zBack: -0.9,    // Position in back
+      centerYFront: hardCenterYFront,  // Vertical offset for front plate
+      centerYBack: hardCenterYBack,   // Vertical offset for back plate
     },
     long: {
-      // Long plate - extended chest to abdomen coverage
-      front: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.36, 0.7, 0.9),   // top left front face
-        new THREE.Vector3(0.36, 0.7, 0.9),    // top right front face
-        new THREE.Vector3(0.36, -0.3, 0.9),   // bottom right front face
-        new THREE.Vector3(-0.36, -0.3, 0.9),  // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.36, 0.7, 0.7),   // top left back face
-        new THREE.Vector3(0.36, 0.7, 0.7),    // top right back face
-        new THREE.Vector3(0.36, -0.3, 0.7),   // bottom right back face
-        new THREE.Vector3(-0.36, -0.3, 0.7),  // bottom left back face
+      // Front plate: 248mm wide (±0.28), 352mm tall (0.40) with curved top
+      shapeFront: [
+        { x: -0.23, y: -0.20 },  // bottom left
+        { x: -0.28, y: -0.16 },  // left side 1
+        { x: -0.28, y: -0.04 },  // left side 2
+        { x: -0.25, y: 0.04 },   // left side 3
+        { x: -0.24, y: 0.12 },   // left side 4
+        { x: -0.18, y: 0.17 },   // left top 5
+        { x: 0.0, y: 0.16 },     // top center peak
+        { x: 0.18, y: 0.17 },    // right top 5
+        { x: 0.24, y: 0.12 },    // right side 4
+        { x: 0.25, y: 0.04 },    // right side 3
+        { x: 0.28, y: -0.04 },   // right side 2
+        { x: 0.28, y: -0.16 },   // right side 1
+        { x: 0.23, y: -0.20 },   // bottom right
       ],
-      back: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.34, 0.68, -0.9),   // top left front face
-        new THREE.Vector3(0.34, 0.68, -0.9),    // top right front face
-        new THREE.Vector3(0.34, -0.28, -0.9),   // bottom right front face
-        new THREE.Vector3(-0.34, -0.28, -0.9),  // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.34, 0.68, -1.1),   // top left back face
-        new THREE.Vector3(0.34, 0.68, -1.1),    // top right back face
-        new THREE.Vector3(0.34, -0.28, -1.1),   // bottom right back face
-        new THREE.Vector3(-0.34, -0.28, -1.1),  // bottom left back face
+      // Back plate: wider and taller (390mm = 0.44)
+      shapeBack: [
+        { x: -0.26, y: -0.22 },  // bottom left
+        { x: -0.32, y: -0.18 },  // left side 1
+        { x: -0.32, y: -0.04 },  // left side 2
+        { x: -0.28, y: 0.04 },   // left side 3
+        { x: -0.27, y: 0.13 },   // left side 4
+        { x: -0.20, y: 0.19 },   // left top 5
+        { x: 0.0, y: 0.18 },     // top center peak
+        { x: 0.20, y: 0.19 },    // right top 5
+        { x: 0.27, y: 0.13 },    // right side 4
+        { x: 0.28, y: 0.04 },    // right side 3
+        { x: 0.32, y: -0.04 },   // right side 2
+        { x: 0.32, y: -0.18 },   // right side 1
+        { x: 0.26, y: -0.22 },   // bottom right
       ],
+      depth: 0.15,
+      zFront: 0.9,
+      zBack: -0.9,
+      centerYFront: longCenterYFront,
+      centerYBack: longCenterYBack,
     },
     short: {
-      // Short plate - minimal chest coverage
-      front: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.24, 0.5, 0.9),   // top left front face
-        new THREE.Vector3(0.24, 0.5, 0.9),    // top right front face
-        new THREE.Vector3(0.24, 0.2, 0.9),    // bottom right front face
-        new THREE.Vector3(-0.24, 0.2, 0.9),   // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.24, 0.5, 0.7),   // top left back face
-        new THREE.Vector3(0.24, 0.5, 0.7),    // top right back face
-        new THREE.Vector3(0.24, 0.2, 0.7),    // bottom right back face
-        new THREE.Vector3(-0.24, 0.2, 0.7),   // bottom left back face
+      // Front plate: 248mm wide (±0.28), 310mm tall (0.35) with curved top
+      shapeFront: [
+        { x: -0.23, y: -0.18 },  // bottom left
+        { x: -0.28, y: -0.14 },  // left side 1
+        { x: -0.28, y: -0.04 },  // left side 2
+        { x: -0.25, y: 0.04 },   // left side 3
+        { x: -0.24, y: 0.11 },   // left side 4
+        { x: -0.18, y: 0.15 },   // left top 5
+        { x: 0.0, y: 0.14 },     // top center peak
+        { x: 0.18, y: 0.15 },    // right top 5
+        { x: 0.24, y: 0.11 },    // right side 4
+        { x: 0.25, y: 0.04 },    // right side 3
+        { x: 0.28, y: -0.04 },   // right side 2
+        { x: 0.28, y: -0.14 },   // right side 1
+        { x: 0.23, y: -0.18 },   // bottom right
       ],
-      back: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.22, 0.48, -0.9),   // top left front face
-        new THREE.Vector3(0.22, 0.48, -0.9),    // top right front face
-        new THREE.Vector3(0.22, 0.22, -0.9),    // bottom right front face
-        new THREE.Vector3(-0.22, 0.22, -0.9),   // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.22, 0.48, -1.1),   // top left back face
-        new THREE.Vector3(0.22, 0.48, -1.1),    // top right back face
-        new THREE.Vector3(0.22, 0.22, -1.1),    // bottom right back face
-        new THREE.Vector3(-0.22, 0.22, -1.1),   // bottom left back face
+      // Back plate: wider and taller (340mm = 0.39)
+      shapeBack: [
+        { x: -0.26, y: -0.19 },  // bottom left
+        { x: -0.32, y: -0.16 },  // left side 1
+        { x: -0.32, y: -0.04 },  // left side 2
+        { x: -0.28, y: 0.04 },   // left side 3
+        { x: -0.27, y: 0.12 },   // left side 4
+        { x: -0.20, y: 0.16 },   // left top 5
+        { x: 0.0, y: 0.15 },     // top center peak
+        { x: 0.20, y: 0.16 },    // right top 5
+        { x: 0.27, y: 0.12 },    // right side 4
+        { x: 0.28, y: 0.04 },    // right side 3
+        { x: 0.32, y: -0.04 },   // right side 2
+        { x: 0.32, y: -0.16 },   // right side 1
+        { x: 0.26, y: -0.19 },   // bottom right
       ],
+      depth: 0.15,
+      zFront: 0.9,
+      zBack: -0.9,
+      centerYFront: shortCenterYFront,
+      centerYBack: shortCenterYBack,
     },
     soft: {
-      // Soft armor - wider coverage including sides
-      front: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.44, 0.76, 0.9),   // top left front face
-        new THREE.Vector3(0.44, 0.76, 0.9),    // top right front face
-        new THREE.Vector3(0.44, -0.1, 0.9),    // bottom right front face
-        new THREE.Vector3(-0.44, -0.1, 0.9),   // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.44, 0.76, 0.7),   // top left back face
-        new THREE.Vector3(0.44, 0.76, 0.7),    // top right back face
-        new THREE.Vector3(0.44, -0.1, 0.7),    // bottom right back face
-        new THREE.Vector3(-0.44, -0.1, 0.7),   // bottom left back face
+      // Rectangular shape - wider coverage
+      shape: [
+        { x: -0.4, y: 0.6 },  // top left
+        { x: 0.4, y: 0.6 },   // top right
+        { x: 0.4, y: 0 },   // bottom right
+        { x: -0.4, y: 0 },  // bottom left
       ],
-      back: [
-        // Front face (4 vertices)
-        new THREE.Vector3(-0.42, 0.74, -0.9),   // top left front face
-        new THREE.Vector3(0.42, 0.74, -0.9),    // top right front face
-        new THREE.Vector3(0.42, -0.08, -0.9),   // bottom right front face
-        new THREE.Vector3(-0.42, -0.08, -0.9),  // bottom left front face
-        // Back face (4 vertices)
-        new THREE.Vector3(-0.42, 0.74, -1.1),   // top left back face
-        new THREE.Vector3(0.42, 0.74, -1.1),    // top right back face
-        new THREE.Vector3(0.42, -0.08, -1.1),   // bottom right back face
-        new THREE.Vector3(-0.42, -0.08, -1.1),  // bottom left back face
-      ],
+      depth: 1,
+      zFront: 0.9,
+      zBack: -0.1,
+      centerYFront: softCenterYFront,
+      centerYBack: softCenterYBack,
     },
   };
 
@@ -528,6 +544,145 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         <div className="text-xs text-gray-600 border-t pt-2">
           <div>פציעות מוצגות: {allMarkers.length} מתוך {totalInjuries}</div>
         </div>
+
+        {/* Plate Position Controls */}
+        {selectedPlate && (
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-md font-semibold mb-3">מיקום לוח</h3>
+            
+            {selectedPlate === 'hard' && (
+              <>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    קדמי Y: {hardCenterYFront.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={hardCenterYFront}
+                    onChange={(e) => setHardCenterYFront(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    אחורי Y: {hardCenterYBack.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={hardCenterYBack}
+                    onChange={(e) => setHardCenterYBack(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              </>
+            )}
+
+            {selectedPlate === 'long' && (
+              <>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    קדמי Y: {longCenterYFront.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={longCenterYFront}
+                    onChange={(e) => setLongCenterYFront(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    אחורי Y: {longCenterYBack.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={longCenterYBack}
+                    onChange={(e) => setLongCenterYBack(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              </>
+            )}
+
+            {selectedPlate === 'short' && (
+              <>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    קדמי Y: {shortCenterYFront.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={shortCenterYFront}
+                    onChange={(e) => setShortCenterYFront(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    אחורי Y: {shortCenterYBack.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={shortCenterYBack}
+                    onChange={(e) => setShortCenterYBack(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              </>
+            )}
+
+            {selectedPlate === 'soft' && (
+              <>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    קדמי Y: {softCenterYFront.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={softCenterYFront}
+                    onChange={(e) => setSoftCenterYFront(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs font-bold mb-1">
+                    אחורי Y: {softCenterYBack.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="-0.5"
+                    max="0.5"
+                    step="0.01"
+                    value={softCenterYBack}
+                    onChange={(e) => setSoftCenterYBack(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 3D Model Display */}
@@ -609,7 +764,25 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                 const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
                 const { min, max } = boundingBox;
                 
-                const plateShape = plateShapes[selectedPlate];
+                const plateConfig = plateShapes[selectedPlate];
+                
+                // Create 3D vertices from 2D shape + z position and depth with Y offset
+                const createPlateVertices = (zPosition: number, depth: number, centerY: number, shapeOverride?: { x: number; y: number }[]) => {
+                  const vertices: THREE.Vector3[] = [];
+                  const shapeToUse = shapeOverride || plateConfig.shape || [];
+                  
+                  // Front face vertices
+                  shapeToUse.forEach(point => {
+                    vertices.push(new THREE.Vector3(point.x, point.y + centerY, zPosition));
+                  });
+                  
+                  // Back face vertices (same x,y but different z)
+                  shapeToUse.forEach(point => {
+                    vertices.push(new THREE.Vector3(point.x, point.y + centerY, zPosition - depth));
+                  });
+                  
+                  return vertices;
+                };
                 
                 // Denormalize vertices to world coordinates
                 const denormalize = (v: THREE.Vector3) => {
@@ -619,78 +792,61 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                   return new THREE.Vector3(worldX, worldY, worldZ);
                 };
 
-                const frontPlateVertices = plateShape.front.map(denormalize);
-                const backPlateVertices = plateShape.back.map(denormalize);
+                const frontPlateVertices = createPlateVertices(
+                  plateConfig.zFront, 
+                  plateConfig.depth, 
+                  plateConfig.centerYFront, 
+                  plateConfig.shapeFront
+                ).map(denormalize);
+                const backPlateVertices = createPlateVertices(
+                  plateConfig.zBack, 
+                  plateConfig.depth, 
+                  plateConfig.centerYBack, 
+                  plateConfig.shapeBack
+                ).map(denormalize);
 
-                // Create a 3D solid plate from 8 vertices (4 front face + 4 back face)
+                // Create a 3D solid plate from vertices
                 const createPlateGeometry = (vertices: THREE.Vector3[]) => {
+                  const numShapeVertices = vertices.length / 2; // Half the vertices are front, half are back
                   const positions: number[] = [];
                   
-                  // Front face (vertices 0-3)
-                  positions.push(
-                    vertices[0].x, vertices[0].y, vertices[0].z,
-                    vertices[1].x, vertices[1].y, vertices[1].z,
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    vertices[3].x, vertices[3].y, vertices[3].z,
-                    vertices[0].x, vertices[0].y, vertices[0].z,
-                  );
+                  // Front face - triangle fan from vertices 0 to numShapeVertices-1
+                  for (let i = 1; i < numShapeVertices - 1; i++) {
+                    positions.push(
+                      vertices[0].x, vertices[0].y, vertices[0].z,
+                      vertices[i].x, vertices[i].y, vertices[i].z,
+                      vertices[i + 1].x, vertices[i + 1].y, vertices[i + 1].z,
+                    );
+                  }
                   
-                  // Back face (vertices 4-7)
-                  positions.push(
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                    vertices[6].x, vertices[6].y, vertices[6].z,
-                    vertices[5].x, vertices[5].y, vertices[5].z,
-                    
-                    vertices[6].x, vertices[6].y, vertices[6].z,
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                    vertices[7].x, vertices[7].y, vertices[7].z,
-                  );
+                  // Back face - triangle fan from vertices numShapeVertices to end
+                  for (let i = 1; i < numShapeVertices - 1; i++) {
+                    positions.push(
+                      vertices[numShapeVertices].x, vertices[numShapeVertices].y, vertices[numShapeVertices].z,
+                      vertices[numShapeVertices + i + 1].x, vertices[numShapeVertices + i + 1].y, vertices[numShapeVertices + i + 1].z,
+                      vertices[numShapeVertices + i].x, vertices[numShapeVertices + i].y, vertices[numShapeVertices + i].z,
+                    );
+                  }
                   
-                  // Top face (0-1 front, 4-5 back)
-                  positions.push(
-                    vertices[0].x, vertices[0].y, vertices[0].z,
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                    vertices[1].x, vertices[1].y, vertices[1].z,
+                  // Side faces - connect front and back edges
+                  for (let i = 0; i < numShapeVertices; i++) {
+                    const nextI = (i + 1) % numShapeVertices;
+                    const frontI = i;
+                    const frontNext = nextI;
+                    const backI = i + numShapeVertices;
+                    const backNext = nextI + numShapeVertices;
                     
-                    vertices[1].x, vertices[1].y, vertices[1].z,
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                    vertices[5].x, vertices[5].y, vertices[5].z,
-                  );
-                  
-                  // Bottom face (2-3 front, 6-7 back)
-                  positions.push(
-                    vertices[3].x, vertices[3].y, vertices[3].z,
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    vertices[7].x, vertices[7].y, vertices[7].z,
-                    
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    vertices[6].x, vertices[6].y, vertices[6].z,
-                    vertices[7].x, vertices[7].y, vertices[7].z,
-                  );
-                  
-                  // Left face (0-3 front, 4-7 back)
-                  positions.push(
-                    vertices[0].x, vertices[0].y, vertices[0].z,
-                    vertices[3].x, vertices[3].y, vertices[3].z,
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                    
-                    vertices[3].x, vertices[3].y, vertices[3].z,
-                    vertices[7].x, vertices[7].y, vertices[7].z,
-                    vertices[4].x, vertices[4].y, vertices[4].z,
-                  );
-                  
-                  // Right face (1-2 front, 5-6 back)
-                  positions.push(
-                    vertices[1].x, vertices[1].y, vertices[1].z,
-                    vertices[5].x, vertices[5].y, vertices[5].z,
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    
-                    vertices[2].x, vertices[2].y, vertices[2].z,
-                    vertices[5].x, vertices[5].y, vertices[5].z,
-                    vertices[6].x, vertices[6].y, vertices[6].z,
-                  );
+                    // Two triangles per side
+                    positions.push(
+                      vertices[frontI].x, vertices[frontI].y, vertices[frontI].z,
+                      vertices[frontNext].x, vertices[frontNext].y, vertices[frontNext].z,
+                      vertices[backNext].x, vertices[backNext].y, vertices[backNext].z,
+                      
+                      vertices[backNext].x, vertices[backNext].y, vertices[backNext].z,
+                      vertices[backI].x, vertices[backI].y, vertices[backI].z,
+                      vertices[frontI].x, vertices[frontI].y, vertices[frontI].z,
+                    );
+                  }
                   
                   const geometry = new THREE.BufferGeometry();
                   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
@@ -728,22 +884,6 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                         roughness={0.3}
                       />
                     </mesh>
-
-                    {/* Vertex markers for front plate */}
-                    {frontPlateVertices.map((vertex, index) => (
-                      <mesh key={`front-plate-marker-${index}`} position={vertex}>
-                        <sphereGeometry args={[0.1]} />
-                        <meshStandardMaterial color="#DC2626" />
-                      </mesh>
-                    ))}
-
-                    {/* Vertex markers for back plate */}
-                    {backPlateVertices.map((vertex, index) => (
-                      <mesh key={`back-plate-marker-${index}`} position={vertex}>
-                        <sphereGeometry args={[0.1]} />
-                        <meshStandardMaterial color="#2563EB" />
-                      </mesh>
-                    ))}
                   </group>
                 );
               })()}
