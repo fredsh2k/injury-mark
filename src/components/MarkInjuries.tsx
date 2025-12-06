@@ -53,6 +53,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   const [marked, setMarked] = useState(false);
   const [, setDimensions] = useState({ min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } });
   const [isLoaded] = useState(false);
+  const [isMeasuring, setIsMeasuring] = useState(false);
+  const [measurementPoints, setMeasurementPoints] = useState<THREE.Vector3[]>([]);
 
   const modelRef = useRef<THREE.Group>(null);
 
@@ -230,6 +232,30 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  const calculateDistance = (points: THREE.Vector3[]) => {
+    if (points.length !== 2) return null;
+    
+    const p1 = points[0];
+    const p2 = points[1];
+    
+    // Calculate distance components in world space
+    const dx = Math.abs(p2.x - p1.x);
+    const dy = Math.abs(p2.y - p1.y);
+    const dz = Math.abs(p2.z - p1.z);
+    
+    // Convert to mm using calibrated scale factors
+    // These were derived from actual measurements:
+    // Shoulder width should be ~460mm (not full body width of 901mm)
+    // Height: 1760mm, Depth: 450mm
+    const dx_mm = dx * 23.336362;  // X-axis: 23.336362 mm per world unit (460mm shoulders)
+    const dy_mm = dy * 24.417468;  // Y-axis: 24.417468 mm per world unit
+    const dz_mm = dz * 42.631579;  // Z-axis: 42.631579 mm per world unit
+    
+    // Calculate 3D Euclidean distance
+    const distanceMm = Math.sqrt(dx_mm * dx_mm + dy_mm * dy_mm + dz_mm * dz_mm);
+    return distanceMm;
+  };
+
   // Add the injury type selector to your JSX
   const renderInjuryTypeSelector = () => (
     <div className="mb-4">
@@ -249,7 +275,34 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
         >
           סימון פוליגון
         </button>
+        <button
+          className={`px-4 py-2 rounded ${isMeasuring ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => {
+            setIsMeasuring(!isMeasuring);
+            if (!isMeasuring) {
+              setMarkers([]);
+              setTemporaryVertices([]);
+              setMeasurementPoints([]);
+            } else {
+              setMeasurementPoints([]);
+            }
+          }}
+        >
+          {isMeasuring ? 'ביטול מדידה' : 'כלי מדידה'}
+        </button>
       </div>
+      {isMeasuring && measurementPoints.length > 0 && (
+        <div className="mt-2 text-sm">
+          {measurementPoints.length === 1 && (
+            <p className="text-gray-600">בחר נקודה שנייה</p>
+          )}
+          {measurementPoints.length === 2 && (
+            <p className="font-bold text-lg text-yellow-600">
+              מרחק: {Math.round(calculateDistance(measurementPoints) || 0)}mm
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -729,6 +782,8 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
               temporaryVertices={temporaryVertices}
               isDrawingPolygon={currentInjuryType === 'polygon'}
               currentRadius={Number((injuryFormData as RadiusInjury).radius)*0.5 || 0.1}
+              isMeasuring={isMeasuring}
+              onMeasurementChange={setMeasurementPoints}
             />
           </Canvas>
         </div>

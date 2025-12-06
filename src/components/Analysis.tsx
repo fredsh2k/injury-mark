@@ -71,9 +71,72 @@ const Analysis = ({ submissions }: AnalysisProps) => {
   const allMarkers: Marker[] = filteredInjuries.map(injury => ({ location: new THREE.Vector3(injury.location.x, injury.location.y, injury.location.z) }))
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const modelRef = useRef<THREE.Group>(null);
+
+  const calculateDistance = (points: THREE.Vector3[]) => {
+    if (points.length !== 2) return null;
+    
+    const p1 = points[0];
+    const p2 = points[1];
+    
+    // Calculate distance components in world space
+    const dx = Math.abs(p2.x - p1.x);
+    const dy = Math.abs(p2.y - p1.y);
+    const dz = Math.abs(p2.z - p1.z);
+    
+    // Convert to mm using calibrated scale factors
+    // These were derived from actual measurements:
+    // Shoulder width should be ~460mm (not full body width of 901mm)
+    // Height: 1760mm, Depth: 450mm
+    const dx_mm = dx * 23.336362;  // X-axis: 23.336362 mm per world unit (460mm shoulders)
+    const dy_mm = dy * 24.417468;  // Y-axis: 24.417468 mm per world unit
+    const dz_mm = dz * 42.631579;  // Z-axis: 42.631579 mm per world unit
+    
+    // Calculate 3D Euclidean distance
+    const distanceMm = Math.sqrt(dx_mm * dx_mm + dy_mm * dy_mm + dz_mm * dz_mm);
+    return distanceMm;
+  };
   const [proximityThreshold, setProximityThreshold] = useState<number>(() => 
     loadProximityThreshold()
   );
+  const [isMeasuring, setIsMeasuring] = useState(false);
+  const [measurementPoints, setMeasurementPoints] = useState<THREE.Vector3[]>([]);
+
+  // Pointer tracking for detecting clicks vs drags on plates
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+  const dragThreshold = 5; // pixels
+
+  const handlePlatePointerDown = (e: any) => {
+    if (isMeasuring) {
+      e.stopPropagation();
+      pointerDownPos.current = { x: e.clientX, y: e.clientY };
+    }
+  };
+
+  const handlePlatePointerUp = (e: any) => {
+    if (isMeasuring && pointerDownPos.current) {
+      e.stopPropagation();
+      const dx = e.clientX - pointerDownPos.current.x;
+      const dy = e.clientY - pointerDownPos.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      pointerDownPos.current = null;
+      
+      if (dist < dragThreshold) {
+        // Treat as click - add measurement point
+        const point = e.point;
+        if (measurementPoints.length === 0) {
+          const newPoints = [point];
+          setMeasurementPoints(newPoints);
+        } else if (measurementPoints.length === 1) {
+          const newPoints = [measurementPoints[0], point];
+          setMeasurementPoints(newPoints);
+        } else {
+          // Reset and start new measurement
+          const newPoints = [point];
+          setMeasurementPoints(newPoints);
+        }
+      }
+    }
+  };
 
   // Defensive plate types and state
   type PlateType = 'hard' | 'long' | 'short' | 'soft' | null;
@@ -737,7 +800,34 @@ const Analysis = ({ submissions }: AnalysisProps) => {
               נקה לוח
             </button>
           )}
+          <button
+            onClick={() => {
+              const newMeasuring = !isMeasuring;
+              setIsMeasuring(newMeasuring);
+              // Always clear points when toggling measurement mode
+              setMeasurementPoints([]);
+            }}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              isMeasuring
+                ? 'bg-yellow-600 text-white'
+                : 'bg-white text-gray-700 hover:bg-yellow-100 border border-gray-300'
+            }`}
+          >
+            {isMeasuring ? 'ביטול מדידה' : 'כלי מדידה'}
+          </button>
         </div>
+        {isMeasuring && measurementPoints.length > 0 && (
+          <div className="mt-2 text-center">
+            {measurementPoints.length === 1 && (
+              <p className="text-gray-600">בחר נקודה שנייה</p>
+            )}
+            {measurementPoints.length === 2 && (
+              <p className="font-bold text-xl text-yellow-600">
+                מרחק: {Math.round(calculateDistance(measurementPoints) || 0)}mm
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Canvas */}
         <div className="flex-1">
@@ -749,7 +839,15 @@ const Analysis = ({ submissions }: AnalysisProps) => {
               <pointLight position={[0, 100, 50]} decay={0} intensity={1} />
               <pointLight position={[0, 100, -50]} decay={0} intensity={1} />
 
-              <HumanModel modelRef={modelRef} onLoad={() => setIsModelLoaded(true)} markers={[]} onClick={() => console.log('click')}></HumanModel>
+              <HumanModel 
+                modelRef={modelRef} 
+                onLoad={() => setIsModelLoaded(true)} 
+                markers={[]} 
+                onClick={() => console.log('click')} 
+                isMeasuring={isMeasuring} 
+                onMeasurementChange={setMeasurementPoints}
+                measurementPoints={measurementPoints}
+              ></HumanModel>
 
               {isModelLoaded &&
                 allMarkers.map((marker, index) => (
@@ -860,7 +958,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                 return (
                   <group>
                     {/* Front plate */}
-                    <mesh geometry={frontPlateGeometry} renderOrder={999}>
+                    <mesh 
+                      geometry={frontPlateGeometry} 
+                      renderOrder={999}
+                      onPointerDown={handlePlatePointerDown}
+                      onPointerUp={handlePlatePointerUp}
+                    >
                       <meshStandardMaterial 
                         color="#4A5568"
                         transparent={true}
@@ -873,7 +976,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     </mesh>
 
                     {/* Back plate */}
-                    <mesh geometry={backPlateGeometry} renderOrder={999}>
+                    <mesh 
+                      geometry={backPlateGeometry} 
+                      renderOrder={999}
+                      onPointerDown={handlePlatePointerDown}
+                      onPointerUp={handlePlatePointerUp}
+                    >
                       <meshStandardMaterial 
                         color="#6B7280"
                         transparent={true}

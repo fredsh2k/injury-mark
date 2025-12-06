@@ -1,5 +1,5 @@
-import { Suspense, useEffect } from 'react';
-import { OrbitControls, Text, Billboard } from '@react-three/drei';
+import { Suspense, useEffect, useState } from 'react';
+import { OrbitControls, Text, Billboard, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { ThreeEvent, useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
@@ -14,6 +14,9 @@ interface HumanModelProps {
   temporaryVertices?: THREE.Vector3[]; // Add this for polygon drawing
   isDrawingPolygon?: boolean; // Add this to determine visualization mode
   currentRadius?: number; // Add this for radius visualization
+  isMeasuring?: boolean; // Add this for measurement mode
+  onMeasurementChange?: (points: THREE.Vector3[]) => void; // Callback for measurement points
+  measurementPoints?: THREE.Vector3[]; // External measurement points to display
 }
 
 const HumanModel: React.FC<HumanModelProps> = ({ 
@@ -23,13 +26,26 @@ const HumanModel: React.FC<HumanModelProps> = ({
   onLoad,
   temporaryVertices = [],
   isDrawingPolygon = false,
-  currentRadius = 1
+  currentRadius = 1,
+  isMeasuring = false,
+  onMeasurementChange,
+  measurementPoints: externalMeasurementPoints
 }) => {
   const scene = useLoader(FBXLoader, "male_body.fbx");
 
   // Track pointer state to distinguish click vs drag
   const pointerDownPos = useRef<{x: number, y: number} | null>(null);
   const dragThreshold = 5; // px
+
+  // Measurement state
+  const [measurementPoints, setMeasurementPoints] = useState<THREE.Vector3[]>([]);
+
+  // Clear measurement points when measurement mode is toggled off
+  useEffect(() => {
+    if (!isMeasuring) {
+      setMeasurementPoints([]);
+    }
+  }, [isMeasuring]);
 
   useEffect(() => {
     if (scene) {
@@ -243,6 +259,51 @@ const HumanModel: React.FC<HumanModelProps> = ({
   };
 
 
+  const renderMeasurement = () => {
+    // Use external measurement points if provided, otherwise use internal
+    const pointsToRender = externalMeasurementPoints || measurementPoints;
+    if (!isMeasuring || pointsToRender.length === 0) return null;
+
+    return (
+      <>
+        {/* Render first point */}
+        <mesh position={pointsToRender[0]} renderOrder={10000}>
+          <sphereGeometry args={[0.5]} />
+          <meshStandardMaterial 
+            color="yellow" 
+            emissive="yellow"
+            emissiveIntensity={0.5}
+            depthTest={false} 
+            depthWrite={false}
+          />
+        </mesh>
+
+        {/* Render second point and line if available */}
+        {pointsToRender.length === 2 && (
+          <>
+            <mesh position={pointsToRender[1]} renderOrder={10000}>
+              <sphereGeometry args={[0.5]} />
+              <meshStandardMaterial 
+                color="yellow" 
+                emissive="yellow"
+                emissiveIntensity={0.5}
+                depthTest={false}
+                depthWrite={false}
+              />
+            </mesh>
+
+            {/* Line between points */}
+            <Line
+              points={[pointsToRender[0], pointsToRender[1]]}
+              color="yellow"
+              lineWidth={3}
+            />
+          </>
+        )}
+      </>
+    );
+  };
+
   // Only call onClick if not a drag
   const handlePointerDown = (e: any) => {
     pointerDownPos.current = { x: e.clientX, y: e.clientY };
@@ -256,7 +317,26 @@ const HumanModel: React.FC<HumanModelProps> = ({
     pointerDownPos.current = null;
     if (dist < dragThreshold) {
       // Only treat as click if pointer didn't move much
-      onClick(e);
+      if (isMeasuring) {
+        // Handle measurement point
+        const point = e.point;
+        if (measurementPoints.length === 0) {
+          const newPoints = [point];
+          setMeasurementPoints(newPoints);
+          onMeasurementChange?.(newPoints);
+        } else if (measurementPoints.length === 1) {
+          const newPoints = [measurementPoints[0], point];
+          setMeasurementPoints(newPoints);
+          onMeasurementChange?.(newPoints);
+        } else {
+          // Reset and start new measurement
+          const newPoints = [point];
+          setMeasurementPoints(newPoints);
+          onMeasurementChange?.(newPoints);
+        }
+      } else {
+        onClick(e);
+      }
     }
   };
 
@@ -282,6 +362,7 @@ const HumanModel: React.FC<HumanModelProps> = ({
         {renderMarkers()}
         {renderPolygonLines()}
         {renderPolygonFill()}
+        {renderMeasurement()}
         {renderOrientationLabels()}
         {renderAxisHelper()}
       </Suspense>
