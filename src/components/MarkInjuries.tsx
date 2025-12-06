@@ -4,7 +4,7 @@ import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 
-import { Injury, Marker, Submission, RadiusInjury, PolygonInjury } from "../Interfaces";
+import { Injury, Marker, Submission, RadiusInjury, PolygonInjury, normalizedToMm } from "../Interfaces";
 import { injuryTypes, selectedLocations, protectionMeans } from "../Constants";
 import HumanModel from "./HumanModel";
 
@@ -30,6 +30,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     description: '',
     selectedLocation: selectedLocations[0],
     location: { x: 0, y: 0, z: 0 },
+    locationMm: { x: 0, y: 0, z: 0 },
     radius: 0,
     injuryType: 'radius'
   }
@@ -38,6 +39,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
     type: injuryTypes[0],
     description: '',
     selectedLocation: selectedLocations[0],
+    locationMm: { x: 0, y: 0, z: 0 },
     location: { x: 0, y: 0, z: 0 },
     vertices: [],
     injuryType: 'polygon'
@@ -194,9 +196,12 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           setMarkers([...markers, { location: point }]);
         }
         setMarked(true);
+        const normalizedLoc = normalizePoint(point);
+        const mmLoc = normalizedToMm(normalizedLoc);
         setInjuryFormData({
           ...injuryFormData,
-          location: normalizePoint(point)
+          location: normalizedLoc,
+          locationMm: mmLoc
         });
       } else if (currentInjuryType === 'polygon') {
         setTemporaryVertices([...temporaryVertices, point]);
@@ -207,9 +212,12 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           centroid.add(vertex);
         });
         centroid.divideScalar(temporaryVertices.length);
+        const normalizedLoc = normalizePoint(centroid);
+        const mmLoc = normalizedToMm(normalizedLoc);
         setInjuryFormData({
           ...injuryFormData,
-          location: normalizePoint(centroid)
+          location: normalizedLoc,
+          locationMm: mmLoc
         });
       }
     }
@@ -270,40 +278,51 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
             value={(injuryFormData as RadiusInjury).radius}
             onChange={handleChangeInjury}
           />
-          <div className="flex flex-row my-2">
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-2">מיקום</label>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="text-xs text-gray-600" htmlFor="location.x">X</label>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="number"
+                  placeholder="x"
+                  name="location.x"
+                  id='location.x'
+                  value={injuryFormData.location.x}
+                  onChange={handleChangeInjury}
+                />
+                <div className="text-xs text-gray-500">{injuryFormData.locationMm.x}mm</div>
+              </div>
 
-            <label className="text-gray-700 font-bold mt-2" htmlFor="location.x">x</label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="number"
-              placeholder="x"
-              name="location.x"
-              id='location.x'
-              value={injuryFormData.location.x}
-              onChange={handleChangeInjury}
-            />
+              <div>
+                <label className="text-xs text-gray-600" htmlFor="location.y">Y</label>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="number"
+                  placeholder="y"
+                  name="location.y"
+                  id='location.y'
+                  value={injuryFormData.location.y}
+                  onChange={handleChangeInjury}
+                />
+                <div className="text-xs text-gray-500">{injuryFormData.locationMm.y}mm</div>
+              </div>
 
-            <label className="text-gray-700 font-bold mt-2" htmlFor="location.y">y</label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="number"
-              placeholder="y"
-              name="location.y"
-              id='location.y'
-              value={injuryFormData.location.y}
-              onChange={handleChangeInjury}
-            />
-
-            <label className="text-gray-700 font-bold mt-2" htmlFor="location.z">z</label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 mx-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="number"
-              placeholder="z"
-              name="location.z"
-              id='location.z'
-              value={injuryFormData.location.z}
-              onChange={handleChangeInjury}
-            />
+              <div>
+                <label className="text-xs text-gray-600" htmlFor="location.z">Z</label>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="number"
+                  placeholder="z"
+                  name="location.z"
+                  id='location.z'
+                  value={injuryFormData.location.z}
+                  onChange={handleChangeInjury}
+                />
+                <div className="text-xs text-gray-500">{injuryFormData.locationMm.z}mm</div>
+              </div>
+            </div>
           </div>
         </div>
       );
