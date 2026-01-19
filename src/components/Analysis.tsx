@@ -351,22 +351,40 @@ const Analysis = ({ submissions }: AnalysisProps) => {
     setProximityThreshold(0.15);
   };
 
-  // Helper functions to count injuries for each filter option
+  // Helper functions to count injuries for each filter option (preview: what if you add this option?)
   const countInjuriesByType = (type: string): number => {
-    return injuries.flat().filter(injury => injury.type === type).length;
+    // Preview: count injuries if this type were the only selected type, respecting other filters
+    return submissions.filter(submission => {
+      const protectionMeansArray = submission.protectionMeans || [];
+      const actualProtectionMeans = protectionMeansArray.length === 0 ? ['ללא מיגון'] : protectionMeansArray;
+      if (selectedProtectionMeans.length === 0) return false;
+      return actualProtectionMeans.some(pm => selectedProtectionMeans.includes(pm));
+    }).map(submission => submission.injuries).flat().filter(injury => {
+      return injury.type === type && selectedInjuryLocations.includes(injury.selectedLocation);
+    }).length;
   };
 
   const countSubmissionsByProtection = (protection: string): number => {
+    // Preview: count injuries if this protection were the only selected, respecting other filters
     return submissions.filter(submission => {
       const protectionMeansArray = submission.protectionMeans || [];
-      // Treat empty protection means as "ללא מיגון"
       const actualProtectionMeans = protectionMeansArray.length === 0 ? ['ללא מיגון'] : protectionMeansArray;
       return actualProtectionMeans.includes(protection);
-    }).reduce((count, submission) => count + submission.injuries.length, 0);
+    }).map(submission => submission.injuries).flat().filter(injury => {
+      return selectedInjuryTypes.includes(injury.type) && selectedInjuryLocations.includes(injury.selectedLocation);
+    }).length;
   };
 
   const countInjuriesByLocation = (location: string): number => {
-    return injuries.flat().filter(injury => injury.selectedLocation === location).length;
+    // Preview: count injuries if this location were the only selected, respecting other filters
+    return submissions.filter(submission => {
+      const protectionMeansArray = submission.protectionMeans || [];
+      const actualProtectionMeans = protectionMeansArray.length === 0 ? ['ללא מיגון'] : protectionMeansArray;
+      if (selectedProtectionMeans.length === 0) return false;
+      return actualProtectionMeans.some(pm => selectedProtectionMeans.includes(pm));
+    }).map(submission => submission.injuries).flat().filter(injury => {
+      return injury.selectedLocation === location && selectedInjuryTypes.includes(injury.type);
+    }).length;
   };
 
 
