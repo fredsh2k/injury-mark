@@ -505,14 +505,14 @@ const Analysis = ({ submissions }: AnalysisProps) => {
 
 
   return (
-    <div className="h-screen flex">
+    <div className="h-full flex">
       {/* Filters Panel */}
-      <div className="w-1/6 bg-gray-100 p-2 overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-sm font-bold">מסננים</h2>
+      <div className="w-1/6 bg-white border-l border-surface-200 p-4 overflow-y-auto">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="section-title text-base">מסננים</h2>
           <button
             onClick={resetAllFilters}
-            className="text-xs bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600"
+            className="btn-danger btn-sm"
             title="איפוס כל המסננים"
           >
             איפוס
@@ -521,8 +521,8 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         
         {/* Proximity Threshold Filter */}
         <div className="mb-6">
-          <label htmlFor="proximityThreshold" className="block text-gray-700 text-sm font-bold mb-2">
-            סף קרבה לפציעה: {proximityThreshold.toFixed(2)}
+          <label htmlFor="proximityThreshold" className="label-text">
+            סף קרבה לפציעה: <span className="text-brand-600 font-bold">{proximityThreshold.toFixed(2)}</span>
           </label>
           <input
             type="range"
@@ -533,32 +533,32 @@ const Analysis = ({ submissions }: AnalysisProps) => {
             step="0.01"
             value={proximityThreshold}
             onChange={(e) => setProximityThreshold(parseFloat(e.target.value))}
-            className="w-full"
+            className="w-full accent-brand-600"
           />
         </div>
 
         {/* Injury Types Filter */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-semibold">סוגי פציעות</h3>
+            <h3 className="text-sm font-semibold text-surface-700">סוגי פציעות</h3>
             <button
               onClick={toggleAllInjuryTypes}
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors"
             >
               {selectedInjuryTypes.length === injuryTypes.length ? 'בטל הכל' : 'בחר הכל'}
             </button>
           </div>
-          <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+          <div className="max-h-64 overflow-y-auto border border-surface-200 rounded-lg p-2 bg-surface-50">
             {injuryTypes.map((type) => (
-              <label key={type} className="flex items-center mb-1 text-xs">
+              <label key={type} className="flex items-center gap-2 py-1 px-1 rounded hover:bg-white transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedInjuryTypes.includes(type)}
                   onChange={(e) => handleInjuryTypeChange(type, e.target.checked)}
-                  className="mr-2 ml-1"
+                  className="filter-checkbox"
                 />
-                <span className="flex-1">
-                  {type} ({countInjuriesByType(type)})
+                <span className="flex-1 text-xs text-surface-600">
+                  {type} <span className="text-surface-400">({countInjuriesByType(type)})</span>
                 </span>
               </label>
             ))}
@@ -568,25 +568,25 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         {/* Protection Means Filter */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-semibold">אמצעי הגנה</h3>
+            <h3 className="text-sm font-semibold text-surface-700">אמצעי הגנה</h3>
             <button
               onClick={toggleAllProtectionMeans}
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors"
             >
               {selectedProtectionMeans.length === protectionMeans.length ? 'בטל הכל' : 'בחר הכל'}
             </button>
           </div>
-          <div className="max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+          <div className="max-h-40 overflow-y-auto border border-surface-200 rounded-lg p-2 bg-surface-50">
             {protectionMeans.map((protection) => (
-              <label key={protection} className="flex items-center mb-1 text-sm">
+              <label key={protection} className="flex items-center gap-2 py-1 px-1 rounded hover:bg-white transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedProtectionMeans.includes(protection)}
                   onChange={(e) => handleProtectionMeansChange(protection, e.target.checked)}
-                  className="mr-2 ml-1"
+                  className="filter-checkbox"
                 />
-                <span className="flex-1">
-                  {protection} ({countSubmissionsByProtection(protection)})
+                <span className="flex-1 text-xs text-surface-600">
+                  {protection} <span className="text-surface-400">({countSubmissionsByProtection(protection)})</span>
                 </span>
               </label>
             ))}
@@ -596,25 +596,25 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         {/* Injury Locations Filter */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-semibold">מיקומי פציעות</h3>
+            <h3 className="text-sm font-semibold text-surface-700">מיקומי פציעות</h3>
             <button
               onClick={toggleAllLocations}
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors"
             >
               {selectedInjuryLocations.length === selectedLocations.length ? 'בטל הכל' : 'בחר הכל'}
             </button>
           </div>
-          <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+          <div className="max-h-64 overflow-y-auto border border-surface-200 rounded-lg p-2 bg-surface-50">
             {selectedLocations.map((location) => (
-              <label key={location} className="flex items-center mb-1 text-xs">
+              <label key={location} className="flex items-center gap-2 py-1 px-1 rounded hover:bg-white transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedInjuryLocations.includes(location)}
                   onChange={(e) => handleLocationChange(location, e.target.checked)}
-                  className="mr-2 ml-1"
+                  className="filter-checkbox"
                 />
-                <span className="flex-1">
-                  {location} ({countInjuriesByLocation(location)})
+                <span className="flex-1 text-xs text-surface-600">
+                  {location} <span className="text-surface-400">({countInjuriesByLocation(location)})</span>
                 </span>
               </label>
             ))}
@@ -622,20 +622,22 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         </div>
 
         {/* Filter Summary */}
-        <div className="text-xs text-gray-600 border-t pt-2">
-          <div>פציעות מוצגות: {allMarkers.length} מתוך {totalInjuries}</div>
+        <div className="bg-surface-50 rounded-lg p-3 border border-surface-200">
+          <div className="text-xs font-medium text-surface-500">
+            פציעות מוצגות: <span className="text-brand-600 font-bold">{allMarkers.length}</span> מתוך <span className="font-bold">{totalInjuries}</span>
+          </div>
         </div>
 
         {/* Plate Position Controls */}
         {selectedPlate && (
-          <div className="mt-6 border-t pt-4">
-            <h3 className="text-md font-semibold mb-3">מיקום לוח</h3>
+          <div className="mt-6 border-t border-surface-200 pt-4">
+            <h3 className="text-sm font-semibold text-surface-700 mb-3">מיקום לוח</h3>
             
             {selectedPlate === 'hard' && (
               <>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    קדמי Y: {hardCenterYFront.toFixed(2)}
+                  <label className="label-text text-xs">
+                    קדמי Y: <span className="text-brand-600">{hardCenterYFront.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -644,12 +646,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={hardCenterYFront}
                     onChange={(e) => setHardCenterYFront(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    אחורי Y: {hardCenterYBack.toFixed(2)}
+                  <label className="label-text text-xs">
+                    אחורי Y: <span className="text-brand-600">{hardCenterYBack.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -658,7 +660,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={hardCenterYBack}
                     onChange={(e) => setHardCenterYBack(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
               </>
@@ -667,8 +669,8 @@ const Analysis = ({ submissions }: AnalysisProps) => {
             {selectedPlate === 'long' && (
               <>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    קדמי Y: {longCenterYFront.toFixed(2)}
+                  <label className="label-text text-xs">
+                    קדמי Y: <span className="text-brand-600">{longCenterYFront.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -677,12 +679,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={longCenterYFront}
                     onChange={(e) => setLongCenterYFront(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    אחורי Y: {longCenterYBack.toFixed(2)}
+                  <label className="label-text text-xs">
+                    אחורי Y: <span className="text-brand-600">{longCenterYBack.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -691,7 +693,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={longCenterYBack}
                     onChange={(e) => setLongCenterYBack(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
               </>
@@ -700,8 +702,8 @@ const Analysis = ({ submissions }: AnalysisProps) => {
             {selectedPlate === 'short' && (
               <>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    קדמי Y: {shortCenterYFront.toFixed(2)}
+                  <label className="label-text text-xs">
+                    קדמי Y: <span className="text-brand-600">{shortCenterYFront.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -710,12 +712,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={shortCenterYFront}
                     onChange={(e) => setShortCenterYFront(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    אחורי Y: {shortCenterYBack.toFixed(2)}
+                  <label className="label-text text-xs">
+                    אחורי Y: <span className="text-brand-600">{shortCenterYBack.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -724,7 +726,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={shortCenterYBack}
                     onChange={(e) => setShortCenterYBack(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
               </>
@@ -733,8 +735,8 @@ const Analysis = ({ submissions }: AnalysisProps) => {
             {selectedPlate === 'soft' && (
               <>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    קדמי Y: {softCenterYFront.toFixed(2)}
+                  <label className="label-text text-xs">
+                    קדמי Y: <span className="text-brand-600">{softCenterYFront.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -743,12 +745,12 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={softCenterYFront}
                     onChange={(e) => setSoftCenterYFront(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="block text-xs font-bold mb-1">
-                    אחורי Y: {softCenterYBack.toFixed(2)}
+                  <label className="label-text text-xs">
+                    אחורי Y: <span className="text-brand-600">{softCenterYBack.toFixed(2)}</span>
                   </label>
                   <input
                     type="range"
@@ -757,7 +759,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
                     step="0.01"
                     value={softCenterYBack}
                     onChange={(e) => setSoftCenterYBack(parseFloat(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-brand-600"
                   />
                 </div>
               </>
@@ -769,43 +771,44 @@ const Analysis = ({ submissions }: AnalysisProps) => {
       {/* 3D Model Display */}
       <div className="w-5/6 flex flex-col">
         {/* Plate Selection Buttons */}
-        <div className="p-4 bg-gray-100 border-b flex gap-2">
+        <div className="px-4 py-3 bg-white border-b border-surface-200 flex gap-2 items-center">
+          <span className="text-xs font-semibold text-surface-400 ml-2">לוחות מגן:</span>
           <button
             onClick={() => setSelectedPlate(selectedPlate === 'hard' ? null : 'hard')}
-            className={`px-4 py-2 rounded font-semibold transition-colors ${
+            className={`btn-sm rounded-lg font-medium transition-all duration-200 ${
               selectedPlate === 'hard'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200 border border-surface-200'
             }`}
           >
             לוח קשיח
           </button>
           <button
             onClick={() => setSelectedPlate(selectedPlate === 'long' ? null : 'long')}
-            className={`px-4 py-2 rounded font-semibold transition-colors ${
+            className={`btn-sm rounded-lg font-medium transition-all duration-200 ${
               selectedPlate === 'long'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200 border border-surface-200'
             }`}
           >
             לוח ארוך
           </button>
           <button
             onClick={() => setSelectedPlate(selectedPlate === 'short' ? null : 'short')}
-            className={`px-4 py-2 rounded font-semibold transition-colors ${
+            className={`btn-sm rounded-lg font-medium transition-all duration-200 ${
               selectedPlate === 'short'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200 border border-surface-200'
             }`}
           >
             לוח קצר
           </button>
           <button
             onClick={() => setSelectedPlate(selectedPlate === 'soft' ? null : 'soft')}
-            className={`px-4 py-2 rounded font-semibold transition-colors ${
+            className={`btn-sm rounded-lg font-medium transition-all duration-200 ${
               selectedPlate === 'soft'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-300'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200 border border-surface-200'
             }`}
           >
             שכפ"צ
@@ -813,34 +816,34 @@ const Analysis = ({ submissions }: AnalysisProps) => {
           {selectedPlate && (
             <button
               onClick={() => setSelectedPlate(null)}
-              className="px-4 py-2 rounded font-semibold bg-red-500 text-white hover:bg-red-600"
+              className="btn-danger btn-sm"
             >
               נקה לוח
             </button>
           )}
+          <div className="border-r border-surface-200 h-6 mx-1" />
           <button
             onClick={() => {
               const newMeasuring = !isMeasuring;
               setIsMeasuring(newMeasuring);
-              // Always clear points when toggling measurement mode
               setMeasurementPoints([]);
             }}
-            className={`px-4 py-2 rounded font-semibold transition-colors ${
+            className={`btn-sm rounded-lg font-medium transition-all duration-200 ${
               isMeasuring
-                ? 'bg-yellow-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-yellow-100 border border-gray-300'
+                ? 'bg-amber-500 text-white shadow-sm'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200 border border-surface-200'
             }`}
           >
             {isMeasuring ? 'ביטול מדידה' : 'כלי מדידה'}
           </button>
         </div>
         {isMeasuring && measurementPoints.length > 0 && (
-          <div className="mt-2 text-center">
+          <div className="py-2 text-center bg-amber-50 border-b border-amber-200">
             {measurementPoints.length === 1 && (
-              <p className="text-gray-600">בחר נקודה שנייה</p>
+              <p className="text-sm text-surface-500">בחר נקודה שנייה</p>
             )}
             {measurementPoints.length === 2 && (
-              <p className="font-bold text-xl text-yellow-600">
+              <p className="font-bold text-lg text-amber-600">
                 מרחק: {Math.round(calculateDistance(measurementPoints) || 0)}mm
               </p>
             )}

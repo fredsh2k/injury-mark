@@ -259,24 +259,24 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   // Add the injury type selector to your JSX
   const renderInjuryTypeSelector = () => (
     <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">
+      <label className="label-text">
         סוג סימון
       </label>
-      <div className="flex space-x-4">
+      <div className="flex gap-2">
         <button
-          className={`px-4 py-2 mx-2 rounded ${currentInjuryType === 'radius' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${currentInjuryType === 'radius' ? 'bg-brand-600 text-white shadow-sm' : 'bg-surface-100 text-surface-600 hover:bg-surface-200'}`}
           onClick={() => handleInjuryTypeChange('radius')}
         >
           סימון רדיוס
         </button>
         <button
-          className={`px-4 py-2 rounded ${currentInjuryType === 'polygon' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${currentInjuryType === 'polygon' ? 'bg-brand-600 text-white shadow-sm' : 'bg-surface-100 text-surface-600 hover:bg-surface-200'}`}
           onClick={() => handleInjuryTypeChange('polygon')}
         >
           סימון פוליגון
         </button>
         <button
-          className={`px-4 py-2 rounded ${isMeasuring ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isMeasuring ? 'bg-amber-500 text-white shadow-sm' : 'bg-surface-100 text-surface-600 hover:bg-surface-200'}`}
           onClick={() => {
             setIsMeasuring(!isMeasuring);
             if (!isMeasuring) {
@@ -294,10 +294,10 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       {isMeasuring && measurementPoints.length > 0 && (
         <div className="mt-2 text-sm">
           {measurementPoints.length === 1 && (
-            <p className="text-gray-600">בחר נקודה שנייה</p>
+            <p className="text-surface-500">בחר נקודה שנייה</p>
           )}
           {measurementPoints.length === 2 && (
-            <p className="font-bold text-lg text-yellow-600">
+            <p className="font-bold text-lg text-amber-600">
               מרחק: {Math.round(calculateDistance(measurementPoints) || 0)}mm
             </p>
           )}
@@ -318,26 +318,25 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   const renderInjurySpecificInputs = () => {
     if (currentInjuryType === 'radius') {
       return (
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="radius">
+        <div className="mb-3">
+          <label className="label-text" htmlFor="radius">
             רדיוס (ס"מ)
           </label>
           <input
-            className="shadow appearance-none border rounded w-1/4 px-3 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="input-field w-1/4"
             type="number"
             name="radius"
-            // increment by 0.5 on each change
             step={0.5}
             value={(injuryFormData as RadiusInjury).radius}
             onChange={handleChangeInjury}
           />
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2">מיקום</label>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="mt-3">
+            <label className="label-text">מיקום</label>
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs text-gray-600" htmlFor="location.x">X</label>
+                <label className="text-xs text-surface-500 font-medium" htmlFor="location.x">X</label>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="input-field"
                   type="number"
                   placeholder="x"
                   name="location.x"
@@ -345,13 +344,13 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                   value={injuryFormData.location.x}
                   onChange={handleChangeInjury}
                 />
-                <div className="text-xs text-gray-500">{injuryFormData.locationMm.x}mm</div>
+                <div className="text-xs text-surface-400 mt-0.5">{injuryFormData.locationMm.x}mm</div>
               </div>
 
               <div>
-                <label className="text-xs text-gray-600" htmlFor="location.y">Y</label>
+                <label className="text-xs text-surface-500 font-medium" htmlFor="location.y">Y</label>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="input-field"
                   type="number"
                   placeholder="y"
                   name="location.y"
@@ -359,13 +358,13 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                   value={injuryFormData.location.y}
                   onChange={handleChangeInjury}
                 />
-                <div className="text-xs text-gray-500">{injuryFormData.locationMm.y}mm</div>
+                <div className="text-xs text-surface-400 mt-0.5">{injuryFormData.locationMm.y}mm</div>
               </div>
 
               <div>
-                <label className="text-xs text-gray-600" htmlFor="location.z">Z</label>
+                <label className="text-xs text-surface-500 font-medium" htmlFor="location.z">Z</label>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="input-field"
                   type="number"
                   placeholder="z"
                   name="location.z"
@@ -373,7 +372,7 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
                   value={injuryFormData.location.z}
                   onChange={handleChangeInjury}
                 />
-                <div className="text-xs text-gray-500">{injuryFormData.locationMm.z}mm</div>
+                <div className="text-xs text-surface-400 mt-0.5">{injuryFormData.locationMm.z}mm</div>
               </div>
             </div>
           </div>
@@ -381,17 +380,15 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       );
     } else {
       return (
-        <div className="mb-1">
-          <span className="text-sm text-gray-600">
+        <div className="mb-3">
+          <span className="text-sm text-surface-500 font-medium">
             {temporaryVertices.length} נקודות נבחרו
-
           </span>
-          {/* show all vertice and add ability to remove single vertice */}
-          <ol className='list-decimal mx-4'>
+          <ol className='list-decimal mx-4 mt-2 space-y-1'>
             {temporaryVertices.map((vertex, index) => (
-              <li key={index}>{`(${normalizePoint(vertex).x} ${normalizePoint(vertex).y} ${normalizePoint(vertex).z})`}
+              <li key={index} className="text-sm text-surface-600">{`(${normalizePoint(vertex).x} ${normalizePoint(vertex).y} ${normalizePoint(vertex).z})`}
                 <button
-                  className='w-16 h-8 m-1 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  className='btn-danger btn-sm mr-2'
                   onClick={() => removeVertex(index)}>
                   הסר
                 </button>
@@ -419,109 +416,103 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
   }
 
   return (
-    <div className="flex mb-4" style={{ height: "93vh" }}>
+    <div className="flex h-full">
 
       {/* Hideable sidebar */}
       {isSidebarVisible && (
-        <div className="w-1/3 py-1 px-4 rounded-lg shadow-md overflow-y-auto">
+        <div className="w-1/3 py-4 px-5 bg-white border-l border-surface-200 overflow-y-auto">
           
           {/* זיהוי החלל Section */}
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                  <span className="text-xl font-bold">זיהוי החלל</span>
+                <DisclosureButton className="flex w-full justify-between items-center rounded-lg bg-gradient-to-l from-brand-600 to-brand-700 px-4 py-2.5 text-sm font-medium text-white hover:from-brand-500 hover:to-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-all duration-200 shadow-sm">
+                  <span className="text-base font-bold">זיהוי החלל</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-white`}
+                    } h-5 w-5 text-white/80 transition-transform duration-200`}
                   />
                 </DisclosureButton>
-                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzIncidentNumber">
+                <DisclosurePanel className="px-1 pt-4 pb-2 space-y-3">
+                  <div>
+                    <label className="label-text" htmlFor="manpatzIncidentNumber">
                       מספר אירוע מנפ"צ
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="manpatzIncidentNumber"
                       type="text"
-                      placeholder=""
                       name="manpatzIncidentNumber"
                       value={formData.manpatzIncidentNumber}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="manpatzTraumaNumber">
+                  <div>
+                    <label className="label-text" htmlFor="manpatzTraumaNumber">
                       מספר טראומה מנפ"צ
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="manpatzTraumaNumber"
                       type="text"
-                      placeholder=""
                       name="manpatzTraumaNumber"
                       value={formData.manpatzTraumaNumber}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="maanahCasualtyNumber">
+                  <div>
+                    <label className="label-text" htmlFor="maanahCasualtyNumber">
                       מספר נפגע במאנ"ח
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="maanahCasualtyNumber"
                       type="text"
-                      placeholder=""
                       name="maanahCasualtyNumber"
                       value={formData.maanahCasualtyNumber}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="id">
+                  <div>
+                    <label className="label-text" htmlFor="id">
                       תעודת זהות
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="id"
                       type="text"
-                      placeholder=""
                       name="id"
                       value={formData.id}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="personalNumber">
+                  <div>
+                    <label className="label-text" htmlFor="personalNumber">
                       מספר אישי
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="personalNumber"
                       type="text"
-                      placeholder=""
                       name="personalNumber"
                       value={formData.personalNumber}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="incidentDateTime">
+                  <div>
+                    <label className="label-text" htmlFor="incidentDateTime">
                       תאריך ושעת האירוע
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="incidentDateTime"
                       type="datetime-local"
-                      placeholder=""
                       name="incidentDateTime"
                       value={formData.incidentDateTime}
                       onChange={handleChange}
@@ -536,72 +527,68 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
-                  <span className="text-xl font-bold">נתוני פטירה</span>
+                <DisclosureButton className="flex w-full justify-between items-center rounded-lg bg-gradient-to-l from-brand-600 to-brand-700 px-4 py-2.5 text-sm font-medium text-white hover:from-brand-500 hover:to-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-all duration-200 shadow-sm mt-3">
+                  <span className="text-base font-bold">נתוני פטירה</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-white`}
+                    } h-5 w-5 text-white/80 transition-transform duration-200`}
                   />
                 </DisclosureButton>
-                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="demiseDateTime">
+                <DisclosurePanel className="px-1 pt-4 pb-2 space-y-3">
+                  <div>
+                    <label className="label-text" htmlFor="demiseDateTime">
                       תאריך ושעת פטירה
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="demiseDateTime"
                       type="datetime-local"
-                      placeholder=""
                       name="demiseDateTime"
                       value={formData.demiseDateTime}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="externalTestDateTime">
+                  <div>
+                    <label className="label-text" htmlFor="externalTestDateTime">
                       תאריך ושעת בדיקה חיצונית
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="externalTestDateTime"
                       type="datetime-local"
-                      placeholder=""
                       name="externalTestDateTime"
                       value={formData.externalTestDateTime}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTDateTime">
+                  <div>
+                    <label className="label-text" htmlFor="PMCTDateTime">
                       תאריך ושעת בדיקת PM-CT
                     </label>
                     <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="PMCTDateTime"
                       type="datetime-local"
-                      placeholder=""
                       name="PMCTDateTime"
                       value={formData.PMCTDateTime}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="mb-1">
-                    <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="PMCTInterpretation">
+                  <div>
+                    <label className="label-text" htmlFor="PMCTInterpretation">
                       פענוח PM-CT
                     </label>
                     <textarea
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="input-field"
                       id="PMCTInterpretation"
-                      placeholder=""
                       name="PMCTInterpretation"
                       value={formData.PMCTInterpretation}
                       onChange={handleChange}
-                      rows={5}
+                      rows={4}
                     />
                   </div>
                 </DisclosurePanel>
@@ -613,26 +600,26 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
           <Disclosure defaultOpen>
             {({ open }) => (
               <>
-                <DisclosureButton className="flex w-full justify-between rounded-lg bg-blue-500 px-4 py-2 text-left text-sm font-medium text-white hover:bg-blue-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 mt-2">
-                  <span className="text-xl font-bold">אמצעי מיגון</span>
+                <DisclosureButton className="flex w-full justify-between items-center rounded-lg bg-gradient-to-l from-brand-600 to-brand-700 px-4 py-2.5 text-sm font-medium text-white hover:from-brand-500 hover:to-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-all duration-200 shadow-sm mt-3">
+                  <span className="text-base font-bold">אמצעי מיגון</span>
                   <ChevronUpIcon
                     className={`${
                       open ? 'rotate-180 transform' : ''
-                    } h-5 w-5 text-white`}
+                    } h-5 w-5 text-white/80 transition-transform duration-200`}
                   />
                 </DisclosureButton>
-                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                  <div className="flex flex-col gap-1 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <DisclosurePanel className="px-1 pt-4 pb-2">
+                  <div className="flex flex-col gap-1.5 bg-surface-50 border border-surface-200 rounded-lg p-3">
                     {protectionMeans.map((item) => (
-                      <label key={item} className="flex items-center mb-1">
+                      <label key={item} className="flex items-center gap-2 cursor-pointer hover:bg-white rounded px-1 py-0.5 transition-colors">
                         <input
                           type="checkbox"
                           value={item}
                           checked={formData.protectionMeans.includes(item)}
                           onChange={handleProtectionMeansCheckbox}
-                          className="form-checkbox h-4 w-4 text-blue-600 ml-1"
+                          className="filter-checkbox ml-1"
                         />
-                        <span>{item}</span>
+                        <span className="text-sm text-surface-700">{item}</span>
                       </label>
                     ))}
                   </div>
@@ -647,145 +634,153 @@ const MarkInjuries = ({ setSubmissions }: { setSubmissions: React.Dispatch<React
       {/* Main content area */}
       <div className={`flex ${isSidebarVisible ? 'w-3/4' : 'w-full'}`}>
         {/* Left column */}
-        <div className={`rounded-lg shadow-md mx-4 p-2 ${isSidebarVisible ? 'w-1/2' : 'w-1/3'}`}>
+        <div className={`card mx-3 my-3 p-5 overflow-y-auto ${isSidebarVisible ? 'w-1/2' : 'w-1/3'}`}>
           {/* Toggle button */}
           <button
             onClick={toggleSidebar}
-            className=" bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded font-bold"
+            className="btn-secondary btn-sm mb-4"
           >
-            {isSidebarVisible ? '<<' : '>>'}
+            {isSidebarVisible ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+              </svg>
+            )}
           </button>
 
-          <h1 className='text-xl border-b pb-1 mb-4'>מאפייני פציעות וטיפול</h1>
+          <h2 className='section-title border-b border-surface-200 pb-2 mb-5'>מאפייני פציעות וטיפול</h2>
 
-
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="type">
-              סוג פציעה
-            </label>
-            <select
-              className="w-1/2 py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              name="type"
-              value={injuryFormData.type}
-              onChange={handleChangeInjury}
-              id='type'
-            >
-              {injuryTypes.map((type, index) => (
-                <option key={index} value={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="injuries.description">
-              תיאור פציעה
-            </label>
-            <textarea
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="injuries.description"
-              placeholder=""
-              name="description"
-              value={injuryFormData.description}
-              onChange={handleChangeInjury}
-              rows={3}
-            />
-          </div>
-          <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="selectedLocation">
-              בחירת מיקום
-            </label>
-            <select
-              className="w-1/3 py-2 px-3 border rounded shadow text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              name="selectedLocation"
-              value={injuryFormData.selectedLocation}
-              onChange={handleChangeInjury}
-              id='selectedLocation'
-            >
-              {/* create option from each selectedLocation */}
-              {selectedLocations.map((location, index) => (
-                <option key={index} value={location}>{location}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="relative group">
-            <h1 className="block text-gray-700 text-sm font-bold mb-1">
-              סימון מיקום <span className="ml-2">(i)</span>
-            </h1>
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/4 mb-2 hidden group-hover:block w-2/3 bg-black text-white text-xs rounded py-2 px-3">
-              לחיצה על המודל תזין את המיקום. כל קואורדינטה מסמלת את המרחק היחסי ממרכז המודל בטווח [1,1-]
+          <div className="space-y-4">
+            <div>
+              <label className="label-text" htmlFor="type">
+                סוג פציעה
+              </label>
+              <select
+                className="input-field w-2/3"
+                name="type"
+                value={injuryFormData.type}
+                onChange={handleChangeInjury}
+                id='type'
+              >
+                {injuryTypes.map((type, index) => (
+                  <option key={index} value={type}>{type}</option>
+                ))}
+              </select>
             </div>
+
+            <div>
+              <label className="label-text" htmlFor="injuries.description">
+                תיאור פציעה
+              </label>
+              <textarea
+                className="input-field"
+                id="injuries.description"
+                name="description"
+                value={injuryFormData.description}
+                onChange={handleChangeInjury}
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="label-text" htmlFor="selectedLocation">
+                בחירת מיקום
+              </label>
+              <select
+                className="input-field w-1/2"
+                name="selectedLocation"
+                value={injuryFormData.selectedLocation}
+                onChange={handleChangeInjury}
+                id='selectedLocation'
+              >
+                {selectedLocations.map((location, index) => (
+                  <option key={index} value={location}>{location}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="relative group">
+              <label className="label-text flex items-center gap-1">
+                סימון מיקום
+                <span className="inline-flex items-center justify-center w-4 h-4 bg-surface-200 rounded-full text-[10px] text-surface-500 cursor-help">i</span>
+              </label>
+              <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-72 bg-surface-800 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
+                לחיצה על המודל תזין את המיקום. כל קואורדינטה מסמלת את המרחק היחסי ממרכז המודל בטווח [1,1-]
+              </div>
+            </div>
+
+            {renderInjuryTypeSelector()}
+            {renderInjurySpecificInputs()}
           </div>
-
-          {renderInjuryTypeSelector()}
-          {renderInjurySpecificInputs()}
-
-
-
-          {/* <div className="mb-1">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="name">
-              רדיוס (ס"מ)
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-1/4 px-3 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="number"
-              placeholder=""
-              name="radius"
-              value={injuryFormData.radius}
-              onChange={handleChangeInjury}
-            />
-          </div> */}
 
           <button
-            className='w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-1'
+            className='btn-primary mt-4'
             onClick={addInjuryField}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
             הוסף פציעה
           </button>
 
 
-          <h1 className='text-xl border-b pb-1 my-1'>רשימת פציעות</h1>
-          <ol className='list-decimal mx-4'>
+          <h2 className='section-title border-b border-surface-200 pb-2 mt-6 mb-3'>רשימת פציעות</h2>
+          {formData.injuries.length === 0 ? (
+            <p className="text-sm text-surface-400 italic">אין פציעות רשומות</p>
+          ) : (
+          <ol className='space-y-2'>
             {formData.injuries.map((injury: Injury, index: number) => (
-              <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} - (${injury.location.x} ${injury.location.y} ${injury.location.z})`}
+              <li key={index} className="flex items-center justify-between bg-surface-50 rounded-lg p-3 border border-surface-100">
+                <span className="text-sm text-surface-700 flex-1">
+                  <span className="font-medium text-surface-800">{index + 1}.</span>{' '}
+                  {`${injury.type} - ${injury.description} - ${injury.selectedLocation}`}
+                  <span className="text-surface-400 text-xs block mt-0.5">{`(${injury.location.x} ${injury.location.y} ${injury.location.z})`}</span>
+                </span>
                 <button
-                  className='w-16 h-8 m-1 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
+                  className='btn-danger btn-sm mr-2 flex-shrink-0'
                   onClick={() => removeInjuryField(index)}>
                   הסר
                 </button>
-                <hr></hr>
               </li>
             ))}
           </ol>
+          )}
 
         </div>
 
-        {/* Right column */}
-        <div className={`rounded-lg shadow-md p-4 ${isSidebarVisible ? 'w-1/2' : 'w-2/3'}`}>
+        {/* Right column - 3D Model */}
+        <div className={`card m-3 p-4 flex flex-col ${isSidebarVisible ? 'w-1/2' : 'w-2/3'}`}>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="btn-primary self-start mb-3"
             onClick={(e) => handleSubmit(e)}
           >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             שמור חלל
           </button>
-          <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
-            <ambientLight intensity={1} />
-            <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
-            <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
-            <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
-            <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
-            <HumanModel
-              onClick={handleClick}
-              modelRef={modelRef}
-              markers={markers}
-              onLoad={() => console.log("loaded")}
-              temporaryVertices={temporaryVertices}
-              isDrawingPolygon={currentInjuryType === 'polygon'}
-              currentRadius={Number((injuryFormData as RadiusInjury).radius)*0.5 || 0.1}
-              isMeasuring={isMeasuring}
-              onMeasurementChange={setMeasurementPoints}
-            />
-          </Canvas>
+          <div className="flex-1 rounded-lg overflow-hidden">
+            <Canvas camera={{ position: [0, 25, 60], fov: 90 }}>
+              <ambientLight intensity={1} />
+              <spotLight position={[0, 50, 50]} decay={0} intensity={5} />
+              <spotLight position={[0, 50, -50]} decay={0} intensity={5} />
+              <pointLight position={[0, 100, 50]} decay={0} intensity={5} />
+              <pointLight position={[0, 100, -50]} decay={0} intensity={5} />
+              <HumanModel
+                onClick={handleClick}
+                modelRef={modelRef}
+                markers={markers}
+                onLoad={() => console.log("loaded")}
+                temporaryVertices={temporaryVertices}
+                isDrawingPolygon={currentInjuryType === 'polygon'}
+                currentRadius={Number((injuryFormData as RadiusInjury).radius)*0.5 || 0.1}
+                isMeasuring={isMeasuring}
+                onMeasurementChange={setMeasurementPoints}
+              />
+            </Canvas>
+          </div>
         </div>
       </div>
 

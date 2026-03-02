@@ -178,84 +178,107 @@ const InjuriesTable = ({ submissions, setSubmissions }: InjuriesTableProps) => {
   };
 
   return (
-    <div className='flex flex-col'>
-      <div className='flex flex-row'>
-        {/* <button
-          className="w-32 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
-          onClick={handleDownload}
-        >
-          הורדת נתונים
-        </button> */}
+    <div className='flex flex-col p-6 h-full'>
+      {/* Action Buttons */}
+      <div className='flex gap-3 mb-6'>
         <button
           onClick={handleCSVDownload}
-          className="w-36 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+          className="btn-primary"
         >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
           הורדת נתונים
         </button>
         <button
-          className="w-36 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+          className="btn-secondary"
           onClick={handleUpload}
         >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
           העלאת נתונים
         </button>
         <button
-          className="w-36 bg-red-500 hover:bg-red-700 text-white font-bold py-1 mb-4 mx-2 rounded focus:outline-none focus:shadow-outline mt-6"
+          className="btn-danger"
           onClick={handleDelete}
         >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
           הסרת נתונים
         </button>
       </div>
 
-
-      {/* create a table from submissions, split each injury to a new line */}
-      <table>
-        <thead className='bg-gray-100'>
-          <tr className='border border-gray-300'>
-            <th className="border border-gray-300 w-32">מספר אירוע מנפ"צ</th>
-            <th className="border border-gray-300 w-32">מספר טראומה מנפ"צ</th>
-            <th className="border border-gray-300 w-32">מספר נפגע במאנ"ח</th>
-            {/* <th className="border border-gray-300">תאריך ושעת האירוע</th>
-            <th className="border border-gray-300">תאריך ושעת פטירה</th>
-            <th className="border border-gray-300">תאריך ושעת בדיקה חיצונית</th>
-            <th className="border border-gray-300">תאריך ושעת בדיקת PM-CT</th>
-            <th className="border border-gray-300">פענות PM-CT</th> */}
-            <th className="border border-gray-300 w-48">אמצעי מיגון</th>
-            <th className="border border-gray-300">פציעות</th>
-            <th className="border border-gray-300 w-2">הסרה</th>
-          </tr>
-        </thead>
-        <tbody>
-          {submissions.map((submission: Submission, index: number) => (
-            <tr key={index} className='border border-gray-300 hover:bg-gray-100'>
-              <td className="px-4">{submission.manpatzIncidentNumber}</td>
-              <td className="border border-gray-300">{submission.manpatzTraumaNumber}</td>
-              <td className="border border-gray-300">{submission.maanahCasualtyNumber}</td>
-              {/* <td className="border border-gray-300">{submission.incidentDateTime}</td>
-              <td className="border border-gray-300">{submission.demiseDateTime}</td>
-              <td className="border border-gray-300">{submission.externalTestDateTime}</td>
-              <td className="border border-gray-300">{submission.PMCTDateTime}</td>
-              <td className="border border-gray-300">{submission.PMCTInterpretation}</td> */}
-              <td className="border border-gray-300">{(submission.protectionMeans && submission.protectionMeans.length > 0) ? submission.protectionMeans.join(', ') : ''}</td>
-              <td className="border border-gray-300 mx-6 px-6">
-                <ul className='list-decimal'>
-                  {submission.injuries.map((injury, index) => (
-                    <li key={index}>{`${injury.type} - ${injury.description} - ${injury.selectedLocation} (${injury.location.x} ${injury.location.y} ${injury.location.z})`}</li>
-                  ))}
-                </ul>
-              </td>
-              <td>
-                {/* row delete button */}
-                <button
-                  className='mr-2 w-16 h-8 bg-red-500 hover:bg-red-700 text-white font-bold rounded focus:outline-none focus:shadow-outline'
-                  onClick={() => handleRowDelete(index)}
-                >
-                  הסר
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Table */}
+      <div className="card overflow-hidden flex-1">
+        <div className="overflow-auto h-full">
+          <table className="w-full">
+            <thead>
+              <tr className='bg-surface-50 border-b border-surface-200'>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider">מספר אירוע מנפ"צ</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider">מספר טראומה מנפ"צ</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider">מספר נפגע במאנ"ח</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider">אמצעי מיגון</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider">פציעות</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider w-20">פעולות</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-100">
+              {submissions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-surface-400">
+                    <div className="flex flex-col items-center gap-2">
+                      <svg className="w-10 h-10 text-surface-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                      </svg>
+                      <span className="text-sm">אין נתונים להצגה</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              submissions.map((submission: Submission, index: number) => (
+                <tr key={index} className='hover:bg-brand-50/30 transition-colors duration-150'>
+                  <td className="px-4 py-3 text-sm text-surface-700 font-medium">{submission.manpatzIncidentNumber}</td>
+                  <td className="px-4 py-3 text-sm text-surface-600">{submission.manpatzTraumaNumber}</td>
+                  <td className="px-4 py-3 text-sm text-surface-600">{submission.maanahCasualtyNumber}</td>
+                  <td className="px-4 py-3 text-sm text-surface-600">
+                    {(submission.protectionMeans && submission.protectionMeans.length > 0) ? (
+                      <div className="flex flex-wrap gap-1">
+                        {submission.protectionMeans.map((pm, i) => (
+                          <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
+                            {pm}
+                          </span>
+                        ))}
+                      </div>
+                    ) : ''}
+                  </td>
+                  <td className="px-4 py-3">
+                    <ul className='space-y-1'>
+                      {submission.injuries.map((injury, injIndex) => (
+                        <li key={injIndex} className="text-sm text-surface-600">
+                          <span className="font-medium text-surface-700">{injIndex + 1}.</span>{' '}
+                          {injury.type} - {injury.description} - {injury.selectedLocation}
+                          <span className="text-surface-400 text-xs mr-1">({injury.location.x} {injury.location.y} {injury.location.z})</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      className='btn-danger btn-sm'
+                      onClick={() => handleRowDelete(index)}
+                    >
+                      הסר
+                    </button>
+                  </td>
+                </tr>
+              ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }
