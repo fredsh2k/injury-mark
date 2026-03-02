@@ -49,6 +49,12 @@ const HumanModel: React.FC<HumanModelProps> = ({
 
   useEffect(() => {
     if (scene) {
+      // Apply white material immediately so the model never appears with dark FBX defaults
+      scene.traverse((child: any) => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        }
+      });
       onLoad();
     }
   }, [scene, onLoad]);

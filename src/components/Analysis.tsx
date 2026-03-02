@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber"
 import HumanModel from "./HumanModel"
-import { Suspense, useEffect, useRef, useState } from "react"
+import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 import { Marker, Submission } from '../Interfaces';
 import { selectedLocations, injuryTypes, protectionMeans } from '../Constants';
@@ -71,6 +71,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
   const allMarkers: Marker[] = filteredInjuries.map(injury => ({ location: new THREE.Vector3(injury.location.x, injury.location.y, injury.location.z) }))
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const modelRef = useRef<THREE.Group>(null);
+  const handleModelLoad = useCallback(() => setIsModelLoaded(true), []);
 
   const calculateDistance = (points: THREE.Vector3[]) => {
     if (points.length !== 2) return null;
@@ -389,19 +390,22 @@ const Analysis = ({ submissions }: AnalysisProps) => {
 
 
   useEffect(() => {
-    if (isModelLoaded && modelRef.current) {
+    const applyHeatmap = () => {
+      if (!modelRef.current) return false;
+
       const boundingBox = new THREE.Box3().setFromObject(modelRef.current);
       const { min, max } = boundingBox;
 
-      // Normalize marker locations within the bounding box
-      allMarkers.forEach(marker => {
-        marker.location.x = (marker.location.x + 1) / 2 * (max.x - min.x) + min.x;
-        marker.location.y = (marker.location.y + 1) / 2 * (max.y - min.y) + min.y;
-        marker.location.z = (marker.location.z + 1) / 2 * (max.z - min.z) + min.z;
-      });
+      // Normalize marker locations within the bounding box (clone to avoid mutation)
+      const normalizedMarkers = allMarkers.map(marker => ({
+        location: new THREE.Vector3(
+          (marker.location.x + 1) / 2 * (max.x - min.x) + min.x,
+          (marker.location.y + 1) / 2 * (max.y - min.y) + min.y,
+          (marker.location.z + 1) / 2 * (max.z - min.z) + min.z
+        )
+      }));
 
       const model = modelRef.current;
-      // const proximityThreshold = 0.15;
       const colorScale = chroma.scale(['blue', 'red'])
 
       model.traverse((child: any) => {
@@ -445,7 +449,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
           centroid.set(0, 0, 0).add(vA).add(vB).add(vC).divideScalar(3);
 
           let points = 0;
-          allMarkers.forEach(marker => {
+          normalizedMarkers.forEach(marker => {
             const markerInLocalSpace = model.worldToLocal(marker.location.clone());
             if (centroid.distanceTo(markerInLocalSpace) < proximityThreshold) {
               points += 1;
@@ -490,16 +494,18 @@ const Analysis = ({ submissions }: AnalysisProps) => {
         // Use a material that supports vertex colors
         child.material = new THREE.MeshStandardMaterial({
           vertexColors: true,
-          wireframe: false, // Set to true if you want to add wireframe overlay
+          wireframe: false,
         });
-
-        // Optionally, add a wireframe overlay
-        // const wireframe = new THREE.LineSegments(
-        //   new THREE.EdgesGeometry(geometry),
-        //   new THREE.LineBasicMaterial({ color: 0x000000 })
-        // );
-        // model.add(wireframe);
       });
+      return true;
+    };
+
+    if (isModelLoaded) {
+      if (!applyHeatmap()) {
+        // modelRef.current not yet available — retry on next animation frame
+        const id = requestAnimationFrame(() => applyHeatmap());
+        return () => cancelAnimationFrame(id);
+      }
     }
   }, [isModelLoaded, modelRef, allMarkers, proximityThreshold]);
 
@@ -862,7 +868,7 @@ const Analysis = ({ submissions }: AnalysisProps) => {
 
               <HumanModel 
                 modelRef={modelRef} 
-                onLoad={() => setIsModelLoaded(true)} 
+                onLoad={handleModelLoad} 
                 markers={[]} 
                 onClick={() => console.log('click')} 
                 isMeasuring={isMeasuring} 
